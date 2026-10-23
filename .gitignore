@@ -1,13 +1,10 @@
-
-
-
-.venv/
-__pycache__/
-.ipynb_checkpoints/
-.env
-
+# (adicionar ao seu .gitignore existente, se faltar)
+.venv
+.gitignore
+banner/*pdf
+figures/*
 data/raw/
 data/processed/
-data/synthetic/
-
-results/
+models/*.joblib
+__pycache__/
+.ipynb_checkpoints/

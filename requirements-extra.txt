@@ -1,0 +1,12 @@
+# Instalar num AMBIENTE SEPARADO (venv) para não mexer nas versões fixadas do requirements.txt:
+#   python -m venv .venv-pylima && source .venv-pylima/bin/activate && pip install -r requirements-extra.txt
+pyLIMA==1.9.8
+VBMicrolensing
+numpy
+scipy
+scikit-learn
+pandas
+matplotlib
+requests
+torch          # CPU basta; GPU acelera o treino da CNN
+reportlab
