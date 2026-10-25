@@ -1,10 +1,11 @@
 # (adicionar ao seu .gitignore existente, se faltar)
-.venv
-.gitignore
-banner/*pdf
-figures/*
 data/raw/
 data/processed/
 models/*.joblib
 __pycache__/
 .ipynb_checkpoints/
+.venv
+figures/*
+banner/*.pdf
+banner/*.png
+banner/*.txt

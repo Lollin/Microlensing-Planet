@@ -24,3 +24,4 @@ python scripts/03_figuras.py
 Tudo que muda o experimento (prioris, telescópios, lacunas, ruído) fica em `mlens/config.py`.
 
 ## Resultado atual (baseline)
+Ver `models/metrics.json`. A MLP recupera t0, u0, tE; **q, s, α ainda não** (próximos passos em `docs/PLANO.md`).

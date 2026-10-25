@@ -8,7 +8,7 @@ from .model import NAMES
 plt.rcParams.update({"font.size": 16, "axes.labelsize": 18, "axes.titlesize": 18,
                      "legend.fontsize": 14, "figure.dpi": 150, "savefig.bbox": "tight",
                      "axes.spines.top": False, "axes.spines.right": False})
-COL = {"Chile": "#1f77b4", "Africa do Sul": "#d62728", "Australia": "#2ca02c"}
+COL = {"Chile": "#1f77b4", "África do Sul": "#d62728", "Austrália": "#2ca02c"}
 
 
 def fig_example(p, data, path):
@@ -155,4 +155,34 @@ def fig_pred_true_cnn(y, P, d2, path, thr=100.0):
         ax.set(xlabel=f"{lab} verdadeiro", ylabel="previsto"); ax.set_title(f"R² = {r2_score(a, b):.2f}")
     ax = axs[5]; ap = P["alpha"][m]; ax.scatter(at, ap, s=5, alpha=0.35, color="#8b1a1a", rasterized=True); ax.plot([0, 2*np.pi], [0, 2*np.pi], "k--", lw=1.2)
     e = np.degrees(np.abs(np.angle(np.exp(1j * (ap - at))))).mean(); ax.set(xlabel="α verdadeiro (rad)", ylabel="previsto"); ax.set_title(f"erro médio = {e:.0f}°")
+    fig.tight_layout(); fig.savefig(path); plt.close(fig)
+
+
+def fig_resultados(y, P, excess, path):
+    """Figura de resultados (população de teste com priori uniforme): log q, log s (com sinal), erro angular de α,
+    matriz de confusão do sinal de log s e erro em função do excesso de chi2 do ajuste 1L1S."""
+    from . import metrics as Mt
+    fig, axs = plt.subplots(2, 3, figsize=(13.5, 8.6)); a1, a2, a3, a4, a5, a6 = axs.ravel()
+    for ax, tv, pv, lab in [(a1, y[:, 3], P["logq"], "log q"), (a2, y[:, 4], P["logs"], "log s")]:
+        ax.hexbin(tv, pv, gridsize=38, bins="log", mincnt=1, cmap="Blues"); lo, hi = tv.min(), tv.max(); ax.plot([lo, hi], [lo, hi], "k--", lw=1.2)
+        ax.set(xlabel=f"{lab} verdadeiro", ylabel=f"{lab} previsto"); ax.set_title(f"{lab}: erro mediano = {np.median(np.abs(pv - tv)):.2f} dex", fontsize=15)
+    da = Mt.wrap_deg(P["alpha"], Mt.alpha_true(y)); a3.hist(da, bins=np.linspace(-180, 180, 37), color="#8b1a1a", alpha=.85)
+    a3.set(xlabel="erro angular de α (graus)", ylabel="eventos", xlim=(-180, 180)); a3.set_title(f"α: erro mediano = {np.median(np.abs(da)):.0f}°", fontsize=15)
+    yt, yp = y[:, 4] > 0, P["p_wide"] > .5; cm = np.array([[np.mean(~yp[~yt]), np.mean(yp[~yt])], [np.mean(~yp[yt]), np.mean(yp[yt])]]) * 100
+    a4.imshow(cm, cmap="Blues", vmin=0, vmax=100)
+    for i in range(2):
+        for j in range(2):
+            a4.text(j, i, f"{cm[i, j]:.0f}%", ha="center", va="center", fontsize=18, color="white" if cm[i, j] > 55 else "black")
+    a4.set_xticks([0, 1], ["s < 1", "s > 1"]); a4.set_yticks([0, 1], ["s < 1", "s > 1"]); a4.set(xlabel="previsto", ylabel="verdadeiro")
+    a4.set_title(f"sinal de log s: acerto = {100 * np.mean(yt == yp):.0f}%", fontsize=15)
+    for ax, err, lab in [(a5, np.abs(P["logq"] - y[:, 3]), "erro absoluto em log q (dex)"), (a6, np.abs(da), "erro absoluto em α (graus)")]:
+        med, lo, hi, xs, ns = [], [], [], [], []
+        for k, (l, h) in enumerate(zip(Mt.EXC_EDGES[:-1], Mt.EXC_EDGES[1:])):
+            m = (excess > l) & (excess <= h)
+            if m.sum() < 20:
+                continue
+            e = err[m]; med.append(np.median(e)); lo.append(np.median(e) - np.percentile(e, 16)); hi.append(np.percentile(e, 84) - np.median(e)); xs.append(k); ns.append(int(m.sum()))
+        ax.errorbar(range(len(xs)), med, yerr=[lo, hi], fmt="o-", color="#1f4e79", capsize=6, lw=2, ms=9)
+        ax.set_xticks(range(len(xs)), [f"{Mt.EXC_LABELS[k]}\n(n={n})" for k, n in zip(xs, ns)], fontsize=12)
+        ax.set(xlabel="excesso de χ² do ajuste 1L1S", ylabel=lab); ax.set_ylim(bottom=0)
     fig.tight_layout(); fig.savefig(path); plt.close(fig)

@@ -19,8 +19,8 @@ RHO = 1e-3                        # raio da fonte (fixo nesta etapa)
 # Rede de telescópios (offset de fase diário em horas, cadência em horas, ruído relativo)
 SITES = {
     "Chile":        {"phase_h": 0.0,  "cadence_h": 1.0, "sigma": 0.010},
-    "Africa do Sul": {"phase_h": 8.0,  "cadence_h": 1.0, "sigma": 0.015},
-    "Australia":    {"phase_h": 16.0, "cadence_h": 1.0, "sigma": 0.020},
+    "África do Sul": {"phase_h": 8.0,  "cadence_h": 1.0, "sigma": 0.015},
+    "Austrália":    {"phase_h": 16.0, "cadence_h": 1.0, "sigma": 0.020},
 }
 NIGHT_HOURS = 8.0                 # janela diária de observação por sítio
 P_BAD_WEATHER = 0.30              # prob. de perder uma noite inteira

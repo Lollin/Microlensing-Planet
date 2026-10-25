@@ -9,7 +9,7 @@ from . import config as C
 
 JD0 = 2460000.0
 # (lat, lon, altitude m) — Las Campanas, Sutherland, Siding Spring
-SITES_GEO = {"Chile": (-29.0, -70.7, 2400), "Africa do Sul": (-32.4, 20.8, 1760), "Australia": (-31.3, 149.1, 1165)}
+SITES_GEO = {"Chile": (-29.0, -70.7, 2400), "África do Sul": (-32.4, 20.8, 1760), "Austrália": (-31.3, 149.1, 1165)}
 
 
 def build_event(rng, p, mag_s=(18.0, 20.5), mag_b=(19.0, 22.0)):

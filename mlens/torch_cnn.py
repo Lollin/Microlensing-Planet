@@ -4,13 +4,13 @@ import numpy as np, torch, torch.nn as nn
 
 
 class Net(nn.Module):
-    def __init__(self, cin=3, nsc=5, nout=8, nb=256):
+    def __init__(self, cin=3, nsc=4, nout=8, nb=256, drop=0.2):
         super().__init__()
         ch, L, c = [32, 64, 128, 128], [], cin
         for o in ch:
             L += [nn.Conv1d(c, o, 7, padding=3), nn.BatchNorm1d(o), nn.GELU(), nn.MaxPool1d(2)]; c = o
         self.conv = nn.Sequential(*L); nflat = c * (nb // 2 ** len(ch))
-        self.head = nn.Sequential(nn.Linear(nflat + nsc, 256), nn.GELU(), nn.Dropout(0.1), nn.Linear(256, nout))
+        self.head = nn.Sequential(nn.Linear(nflat + nsc, 256), nn.GELU(), nn.Dropout(drop), nn.Linear(256, nout))
 
     def forward(self, x, sc):
         return self.head(torch.cat([self.conv(x).flatten(1), sc], 1))
@@ -35,8 +35,11 @@ def decode(out, ymean, ystd):
 
 
 @torch.no_grad()
-def predict(path, X, sc, device=None):
+def predict(path, X, sc, device=None, chunk=1000):
     dev = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    ck = torch.load(path, map_location=dev, weights_only=False); net = Net().to(dev); net.load_state_dict(ck["state"]); net.eval()
-    x = torch.tensor(prep_x(X)).to(dev); s = torch.tensor((sc - ck["scm"]) / ck["scs"], dtype=torch.float32).to(dev)
-    return decode(net(x, s).cpu().numpy(), ck["ym"], ck["ys"])
+    ck = torch.load(path, map_location=dev, weights_only=False); net = Net(nsc=len(ck["scm"])).to(dev); net.load_state_dict(ck["state"]); net.eval()
+    outs = []
+    for i in range(0, len(X), chunk):
+        x = torch.tensor(prep_x(X[i:i + chunk])).to(dev); s = torch.tensor((sc[i:i + chunk] - ck["scm"]) / ck["scs"], dtype=torch.float32).to(dev)
+        outs.append(net(x, s).cpu().numpy())
+    return decode(np.concatenate(outs), ck["ym"], ck["ys"])

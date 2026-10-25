@@ -1,1 +1,1 @@
-{"n_train": 39368, "n_test": 12000}
+{"n_train": 21000, "n_val": 3000, "n_test_mix": 6000, "best_epoch": 9, "epochs": 30, "n_test_uniform": 6000}

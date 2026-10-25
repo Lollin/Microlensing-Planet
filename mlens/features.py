@@ -36,7 +36,7 @@ def pspl_fit(t, f, s):
 
 
 def featurize(data):
-    """data = {sítio: (t, fluxo, erro)}  ->  (X[3,NB], escalares[5], dchi2)"""
+    """data = {sítio: (t, fluxo, erro)}  ->  (X[3,NB], escalares[4], excesso_chi2)"""
     t = np.concatenate([d[0] for d in data.values()]); f = np.concatenate([d[1] for d in data.values()])
     s = np.concatenate([d[2] for d in data.values()])
     fit = pspl_fit(t, f, s); tau = (t - fit["t0"]) / fit["tE"]; r = (f - fit["model"]) / s
@@ -46,6 +46,7 @@ def featurize(data):
     z = np.bincount(k[ok], r[ok], NB) / np.sqrt(cnt)               # z-score do resíduo médio por bin
     mask = (n > 0).astype(float)
     X = np.stack([np.where(mask > 0, fl, 1.0), np.clip(z, -20, 20), mask]).astype(np.float32)
-    dchi2 = fit["chi2"] - len(t)                                   # ~ Δχ² vs. modelo verdadeiro (χ²_verd ≈ N)
-    sc = np.array([np.log10(max(dchi2, 1.0)), np.log10(fit["tE"]), np.log10(fit["u0"]), fit["fs"], (fit["t0"] - C.T_MIN) / (C.T_MAX - C.T_MIN)], np.float32)
+    dchi2 = fit["chi2"] - len(t)                                   # EXCESSO de chi2 do ajuste 1L1S (chi2_1L1S - N): usa só dados e o ajuste 1L1S, nenhum parâmetro 2L1S
+    # NÃO entra na rede; serve só para estratificar a avaliação. Escalares de entrada: tE, u0, fluxo da fonte e t0 do ajuste 1L1S.
+    sc = np.array([np.log10(fit["tE"]), np.log10(fit["u0"]), fit["fs"], (fit["t0"] - C.T_MIN) / (C.T_MAX - C.T_MIN)], np.float32)
     return X, sc, dchi2, fit
