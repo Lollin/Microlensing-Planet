@@ -1,0 +1,1 @@
+{"cfg": {"uchan": true, "target": "x", "wbin": 1.0, "null": true, "train_data": "data/processed/train_null.npz"}, "n_train": 21000, "n_val": 3000, "n_test_mix": 6000, "best_epoch": 11, "epochs": 30, "n_test_uniform": 6000}

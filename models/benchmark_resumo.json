@@ -1,0 +1,37 @@
+{
+ "n": 20,
+ "n_ajustados": 14,
+ "n_falha_ambos": 6,
+ "tempo_rede_s": 0.025487542152404785,
+ "tempo_ajuste_rede_s": 6.133983373641968,
+ "tempo_busca_cega_s": 136.9488546848297,
+ "razao_tempo": 20.854876744192765,
+ "sucesso_rede": 5,
+ "sucesso_cega": 6,
+ "rede_igual_ou_melhor": 6,
+ "erro_logq": {
+  "rede": 0.58701531076553,
+  "ajuste_rede": 0.4943580505318593,
+  "busca_cega": 0.4363351612567088
+ },
+ "erro_logs": {
+  "rede": 0.05941447623774282,
+  "ajuste_rede": 0.11057204017623597,
+  "busca_cega": 0.13834617960264958
+ },
+ "erro_alpha_graus": {
+  "rede": 25.624296655730195,
+  "ajuste_rede": 24.389659351998485,
+  "busca_cega": 11.085115667092701
+ },
+ "dois_ramos": {
+  "n": 14,
+  "tempo_s": 25.060850381851196,
+  "sucesso": 6,
+  "igual_ou_melhor_que_cega": 11,
+  "erro_logq": 0.4641273787143063,
+  "erro_logs": 0.13408798419997386,
+  "erro_alpha_graus": 26.195414597085154,
+  "topologia_certa_entre_sucessos": "4 de 6"
+ }
+}

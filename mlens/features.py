@@ -18,7 +18,9 @@ def _lin(A, f, w):                      # fluxo = fb + fs*A  (mínimos quadrados
     return S @ th, th
 
 
-def pspl_fit(t, f, s):
+def pspl_fit(t, f, s, robust=False):
+    """robust=True: perda soft_l1, que reduz o peso de pontos extremos (ex.: pico de cruzamento de cáustica). Usado só no pré-ajuste dos dados reais;
+    o treino usa robust=False."""
     w = 1.0 / s ** 2
     def res(q):
         m, _ = _lin(_A(t, q[0], np.exp(q[1]), np.exp(q[2])), f, w); return (f - m) / s
@@ -30,7 +32,8 @@ def pspl_fit(t, f, s):
         for tE in (10., 25., 50.):
             q = np.array([t0g, np.log(u0), np.log(tE)]); c = np.sum(res(q) ** 2)
             if best is None or c < best[0]: best = (c, q)
-    sol = least_squares(res, best[1], method="lm", max_nfev=60)
+    sol = (least_squares(res, best[1], method="trf", loss="soft_l1", f_scale=3.0, max_nfev=200) if robust
+           else least_squares(res, best[1], method="lm", max_nfev=60))
     q = sol.x; m, th = _lin(_A(t, q[0], np.exp(q[1]), np.exp(q[2])), f, w)
     return dict(t0=q[0], u0=np.exp(q[1]), tE=np.exp(q[2]), fs=th[0], fb=th[1], model=m, chi2=float(np.sum(((f - m) / s) ** 2)))
 

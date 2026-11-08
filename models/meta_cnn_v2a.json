@@ -1,0 +1,1 @@
+{"cfg": {"uchan": true, "target": "abslogs", "wbin": 1.0, "train_data": "data/processed/train_mix.npz"}, "n_train": 21000, "n_val": 3000, "n_test_mix": 6000, "best_epoch": 8, "epochs": 30, "n_test_uniform": 6000}

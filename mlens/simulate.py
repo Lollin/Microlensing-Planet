@@ -7,11 +7,16 @@ _VBM = VBMicrolensing.VBMicrolensing()
 _VBM.Tol = 1e-3
 
 
-def sample_params(rng, caustic_frac=None):
+def sample_params(rng, caustic_frac=None, p_null=0.0, null_vbm=False):
     """Priori uniforme; com prob. caustic_frac a trajetória é ancorada num ponto aleatório da cáustica (+ jitter).
+    Com prob. p_null o evento NÃO tem planeta (lente simples): p["null"] = True e q, s, α são ignorados.
     Convenção VBM: fonte(τ) = u0·(sinα, −cosα) + τ·(−cosα, −sinα), com τ=(t−t0)/tE."""
     frac = C.CAUSTIC_FRAC if caustic_frac is None else caustic_frac
     p = {k: rng.uniform(*v) for k, v in C.PRIORS.items()}
+    if p_null > 0 and rng.random() < p_null:
+        p["null"] = True
+        if null_vbm: p["null_vbm"] = True
+        return p
     if rng.random() >= frac:
         return p
     cs = _VBM.Caustics(10 ** p["logs"], 10 ** p["logq"])
@@ -27,6 +32,11 @@ def sample_params(rng, caustic_frac=None):
 
 
 def magnification(p, t):
+    if p.get("null") and p.get("null_vbm"):              # controle: mesmo código numérico, planeta desprezível e muito distante
+        p = dict(p, logq=-9.0, logs=1.0, null=False)
+    if p.get("null"):                                    # lente simples (fonte pontual; u0 >= 0,01 >> rho)
+        u2 = p["u0"] ** 2 + ((np.asarray(t) - p["t0"]) / p["tE"]) ** 2
+        return (u2 + 2) / np.sqrt(u2 * (u2 + 4))
     # VBM: [log s, log q, u0, alpha, log rho, log tE, t0]  (logs naturais)
     pr = [np.log(10 ** p["logs"]), np.log(10 ** p["logq"]), p["u0"], p["alpha"],
           np.log(C.RHO), np.log(p["tE"]), p["t0"]]

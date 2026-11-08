@@ -1,10 +1,11 @@
 """Benchmark: RNA/CNN (+ ajuste pyLIMA inicializado por ela) vs. busca 'cega' multi-partida do pyLIMA, em eventos simulados com pyLIMA.
-Ex.:  python scripts/04_benchmark_pylima.py --n 20 --thin 2 --model models/cnn_2l1s.pt   (~3-5 min/evento por causa do ajuste cego)"""
+Ex.:  python scripts/04_benchmark_pylima.py --n 20 --thin 2 --model models/cnn_2l1s.pt   (~3-5 min/evento por causa do ajuste cego)
+Versão 3: também faz o ajuste em dois ramos (close/wide, + ressonante) a partir da magnitude |s − 1/s| prevista pela rede (colunas br_*)."""
 import sys, pathlib, argparse, time, numpy as np, pandas as pd
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from mlens.simulate_pylima import simulate_event_pylima, JD0
 from mlens.features import featurize
-from mlens.pylima_fit import fit_usbl, blind_multistart
+from mlens.pylima_fit import fit_usbl, blind_multistart, fit_branches, topologia
 from mlens.torch_cnn import predict
 
 ap = argparse.ArgumentParser(); ap.add_argument("--n", type=int, default=20); ap.add_argument("--thin", type=int, default=2)
@@ -18,11 +19,17 @@ for i in range(a.n):
     s_nn = 10 ** float(P["logs"][0]); q_nn = 10 ** float(P["logq"][0]); al_nn = float(P["alpha"][0])
     try: r_nn = fit_usbl(thin, [*base, s_nn, q_nn, al_nn])
     except Exception as e: r_nn = None
+    try: r_br = fit_branches(thin, base, float(P["abs_logs"][0]), q_nn, al_nn)
+    except Exception as e: r_br = None
     r_bl = blind_multistart(thin, base)
     f = lambda r, k: np.nan if r is None else r[k]
     rows.append(dict(i=i, dchi2=d2, true_logq=p["logq"], true_logs=p["logs"], true_alpha=p["alpha"],
         nn_logq=float(P["logq"][0]), nn_logs=float(P["logs"][0]), nn_alpha=al_nn, t_nn_s=t_nn,
+        nn_p_planet=float(P["p_planet"][0]) if "p_planet" in P else np.nan, true_topologia=topologia(10 ** p["logs"], 10 ** p["logq"]),
+        br_chi2N=f(r_br, "chi2") / N, br_logq=np.log10(f(r_br, "q")), br_logs=np.log10(f(r_br, "s")), br_alpha=f(r_br, "alpha"), br_s=f(r_br, "seconds"),
+        br_topologia=None if r_br is None else r_br["topologia"], br_dchi2_outro=f(r_br, "dchi2_outro_ramo"),
         fitNN_chi2N=f(r_nn, "chi2") / N, fitNN_logq=np.log10(f(r_nn, "q")), fitNN_logs=np.log10(f(r_nn, "s")), fitNN_alpha=f(r_nn, "alpha"), fitNN_s=f(r_nn, "seconds"),
         blind_chi2N=f(r_bl, "chi2") / N, blind_logq=np.log10(f(r_bl, "q")), blind_logs=np.log10(f(r_bl, "s")), blind_alpha=f(r_bl, "alpha"), blind_s=f(r_bl, "seconds")))
-    pd.DataFrame(rows).to_csv(a.out, index=False); print(f"[{i + 1}/{a.n}] Δχ²={d2:.0f}  χ²/N: NN-init={rows[-1]['fitNN_chi2N']:.2f}  cego={rows[-1]['blind_chi2N']:.2f}  tempo: {t_nn:.3f}s vs {rows[-1]['blind_s']:.0f}s")
+    pd.DataFrame(rows).to_csv(a.out, index=False); print(f"[{i + 1}/{a.n}] Δχ²={d2:.0f}  χ²/N: NN-init={rows[-1]['fitNN_chi2N']:.2f}  dois ramos={rows[-1]['br_chi2N']:.2f}  cego={rows[-1]['blind_chi2N']:.2f}  "
+          f"topologia: verdadeira={rows[-1]['true_topologia']} ajustada={rows[-1]['br_topologia']}  tempo: {t_nn:.3f}s / {rows[-1]['br_s']:.0f}s / {rows[-1]['blind_s']:.0f}s")
 print("salvo em", a.out)
