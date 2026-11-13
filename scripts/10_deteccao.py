@@ -18,9 +18,17 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 ap = argparse.ArgumentParser(); ap.add_argument("--run", default="v3")
 ap.add_argument("--null-file", default=None, help="outro conjunto sem planeta (ex.: test_null_vbm.npz); exige --model")
 ap.add_argument("--model", default=None, help="modelo para calcular p_planeta no --null-file")
+ap.add_argument("--logq-max", type=float, default=None, help="só eventos com planeta de log10 q < valor (ex.: -1.52 para q < 0,03; tópico 3)")
 ap.add_argument("--null-calib", default=str(ROOT / "data/processed/test_null.npz"), help="conjunto sem planeta usado no treino (--null-test do 02b)"); a = ap.parse_args()
 P = np.load(ROOT / f"data/processed/test_pred_uniform_{a.run}.npz")
+SUF = "" if a.logq_max is None else f"_logq{a.logq_max:g}"
 pp_pl, d2_pl = P["p_planet"], P["d2"]
+if "planet" in P.files:                                             # garante que só entram eventos com planeta
+    k = P["planet"] > 0; pp_pl, d2_pl, y_pl = pp_pl[k], d2_pl[k], P["y"][k]
+else:
+    y_pl = P["y"]
+if a.logq_max is not None:                                          # regime planetário: o limiar continua vindo dos eventos sem planeta
+    k = y_pl[:, 3] < a.logq_max; pp_pl, d2_pl = pp_pl[k], d2_pl[k]
 if a.null_file:                                                     # controle: calcula p_planeta agora, com o modelo dado
     sys.path.insert(0, str(ROOT)); from mlens.torch_cnn import predict
     z = np.load(a.null_file); pp_nu = predict(a.model, z["X"], z["sc"])["p_planet"]; d2_nu = z["dchi2"]
@@ -43,7 +51,7 @@ for fpr in (0.05, 0.01):
     R["por_taxa_falso_positivo"][f"{int(fpr * 100)}%"] = linha
 print(json.dumps(R, indent=1, ensure_ascii=False))
 (ROOT / "models").mkdir(exist_ok=True)
-json.dump(R, open(ROOT / f"models/deteccao_{a.run}.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+json.dump(R, open(ROOT / f"models/deteccao_{a.run}{SUF}.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 
 fig, ax = plt.subplots(1, 2, figsize=(12, 4.6))
 b = np.linspace(0, 1, 41)
@@ -59,4 +67,4 @@ ax[1].set_xticks(x, LAB); ax[1].set_ylim(0, 1.05); ax[1].legend()
 ax[1].set_xlabel(r"excesso de $\chi^2$ do ajuste 1L1S"); ax[1].set_ylabel("completeza (fração detectada)")
 ax[1].set_title("(b) Completeza com 5% de falsos positivos")
 plt.tight_layout(); (ROOT / "figures").mkdir(exist_ok=True)
-plt.savefig(ROOT / f"figures/fig_deteccao_{a.run}.png", dpi=200); print(f"salvo: figures/fig_deteccao_{a.run}.png")
+plt.savefig(ROOT / f"figures/fig_deteccao_{a.run}{SUF}.png", dpi=200); print(f"salvo: figures/fig_deteccao_{a.run}{SUF}.png")

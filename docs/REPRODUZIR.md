@@ -50,6 +50,7 @@ Treinos: semente 0 (e 1 para a segunda semente), 30 épocas, AdamW, taxa máxima
 | Tabela 12 (duas sementes) | `07_r2.py` nos runs `final`, `final_s1` | `models/r2_final.json`, `models/r2_final_s1.json` |
 | Regime planetário, q < 0,03 (tópico 3) | `15_regime_planetario.py --run final` | `models/regime_planetario_final.json` |
 | Tabela 6, Figura 10 (detecção) | `10_deteccao.py --run final_det` | `models/deteccao_final_det.json`, `figures/fig_deteccao_final_det.png` |
+| Detecção só no regime planetário, q < 0,03 (tópico 3) | `10_deteccao.py --logq-max -1.52` | `models/deteccao_final_det_logq-1.52.json` |
 | Controle da detecção | `10_deteccao.py --null-file test_null_vbm.npz` | `models/deteccao_final_det_test_null_vbm.json` |
 | Tabela 7, Figura 11 (eventos 1L1S) | `11_avaliar_1l1s.py --run final_det` | `models/avaliacao_1l1s_final_det.json`, `figures/fig_1l1s_final_det.png` |
 | Tabela 8, Figura 12 (pyLIMA) | `13_benchmark_pylima_v2.py` + `14_resumo_benchmark_v2.py` | `models/benchmark_v2_resumo.json`, `figures/fig_benchmark_v2.png` |

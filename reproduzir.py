@@ -66,6 +66,8 @@ ANALISES = [
     (f"models/deteccao_final_det{R}.json",       "scripts/10_deteccao.py", ["--run", f"final_det{R}", "--null-calib", f"{D}/test_null{R}.npz"]),
     (f"models/deteccao_final_det{R}_test_null_vbm{R}.json", "scripts/10_deteccao.py",
      ["--run", f"final_det{R}", "--null-file", f"{D}/test_null_vbm{R}.npz", "--model", f"models/cnn_final_det{R}.pt", "--null-calib", f"{D}/test_null{R}.npz"]),
+    (f"models/deteccao_final_det{R}_logq-1.52.json", "scripts/10_deteccao.py",
+     ["--run", f"final_det{R}", "--null-calib", f"{D}/test_null{R}.npz", "--logq-max", "-1.52"]),   # regime planetário (q < 0,03)
     (f"models/avaliacao_1l1s_final_det{R}.json", "scripts/11_avaliar_1l1s.py",
      ["--run", f"final_det{R}", "--null-calib", f"{D}/test_null{R}.npz", "--null-eval", f"{D}/test_null_indep{R}.npz"]),
     ("figures/fig_topologias.png",               "scripts/03b_figuras_cnn.py", []),
