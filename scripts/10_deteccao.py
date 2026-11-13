@@ -17,7 +17,8 @@ for _s in (sys.stdout, sys.stderr):
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ap = argparse.ArgumentParser(); ap.add_argument("--run", default="v3")
 ap.add_argument("--null-file", default=None, help="outro conjunto sem planeta (ex.: test_null_vbm.npz); exige --model")
-ap.add_argument("--model", default=None, help="modelo para calcular p_planeta no --null-file"); a = ap.parse_args()
+ap.add_argument("--model", default=None, help="modelo para calcular p_planeta no --null-file")
+ap.add_argument("--null-calib", default=str(ROOT / "data/processed/test_null.npz"), help="conjunto sem planeta usado no treino (--null-test do 02b)"); a = ap.parse_args()
 P = np.load(ROOT / f"data/processed/test_pred_uniform_{a.run}.npz")
 pp_pl, d2_pl = P["p_planet"], P["d2"]
 if a.null_file:                                                     # controle: calcula p_planeta agora, com o modelo dado
@@ -26,7 +27,7 @@ if a.null_file:                                                     # controle: 
     a.run = a.run + "_" + pathlib.Path(a.null_file).stem
 else:
     pp_nu = np.load(ROOT / f"data/processed/test_null_pplanet_{a.run}.npy")
-    d2_nu = np.load(ROOT / "data/processed/test_null.npz")["dchi2"]
+    d2_nu = np.load(a.null_calib)["dchi2"]
 
 EDG = [-np.inf, 10, 100, 1000, np.inf]; LAB = ["<10", "10-100", "100-1000", ">1000"]
 lab = np.r_[np.ones(len(pp_pl)), np.zeros(len(pp_nu))]

@@ -19,16 +19,35 @@ def make_event(data_jd, name="evt", ra=270.0, dec=-30.0):
     return ev
 
 
+def _dentro_dos_limites(f, guess, margem=1e-3):
+    """Traz o ponto de partida para dentro dos limites do pyLIMA (ex.: u0 em (−1, 1)). Sem isso, um u0 > 1 vindo do ajuste PSPL
+    com luz de mistura livre faz o pyLIMA recusar o ponto de partida, e o evento inteiro falhava em todas as estratégias.
+    Retorna (guess corrigido, lista dos parâmetros alterados)."""
+    g, mudou = list(guess), []
+    try:
+        for nome, (i, (lo, hi)) in f.fit_parameters.items():
+            if i >= len(g): continue
+            lo, hi = float(lo), float(hi); d = margem * (hi - lo)
+            if not (lo + d <= g[i] <= hi - d):
+                g[i] = float(np.clip(g[i], lo + d, hi - d)); mudou.append(nome)
+    except Exception:                                      # API diferente do pyLIMA 1.9.8: segue sem corrigir
+        pass
+    return g, mudou
+
+
 def fit_usbl(data_jd, guess, rho=1e-3, loss="chi2"):
-    """guess = [t0_JD, u0, tE, s, q, alpha]; retorna dict(params, chi2, tempo)."""
+    """guess = [t0_JD, u0, tE, s, q, alpha]; retorna dict(params, chi2, tempo, parametros_ajustados_aos_limites)."""
     ev = make_event(data_jd); model = USBL_model.USBLmodel(ev)
     f = TRF_fit.TRFfit(model, loss_function=loss)
-    f.model_parameters_guess = [guess[0], guess[1], guess[2], rho, guess[3], guess[4], guess[5]]
+    g = [guess[0], guess[1], guess[2], rho, guess[3], guess[4], float(guess[5]) % (2 * np.pi)]
+    g, mudou = _dentro_dos_limites(f, g)
+    f.model_parameters_guess = g
     t0 = time.time(); f.fit()
     if "best_model" not in f.fit_results:
         raise RuntimeError("pyLIMA recusou o ponto de partida (parâmetro fora dos limites); ajuste não realizado")
     b = f.fit_results["best_model"]
-    return dict(t0=b[0], u0=b[1], tE=b[2], rho=b[3], s=b[4], q=b[5], alpha=b[6], chi2=float(f.fit_results["chi2"]), seconds=time.time() - t0)
+    return dict(t0=b[0], u0=b[1], tE=b[2], rho=b[3], s=b[4], q=b[5], alpha=b[6], chi2=float(f.fit_results["chi2"]), seconds=time.time() - t0,
+                limites=mudou)
 
 
 def blind_multistart(data_jd, base, s_grid=(0.8, 1.3), alpha_grid=(0.0, 1.57, 3.14, 4.71), q0=1e-3):
@@ -92,7 +111,7 @@ def fit_pspl(data_jd, guess):
     """Ajuste de lente simples (PSPL) com o pyLIMA, para comparar χ² na mesma escala do ajuste binário. guess = [t0_JD, u0, tE]."""
     from pyLIMA.models import PSPL_model
     ev = make_event(data_jd); model = PSPL_model.PSPLmodel(ev)
-    f = TRF_fit.TRFfit(model); f.model_parameters_guess = list(guess); f.fit()
+    f = TRF_fit.TRFfit(model); f.model_parameters_guess = _dentro_dos_limites(f, list(guess))[0]; f.fit()
     if "best_model" not in f.fit_results:
         raise RuntimeError("pyLIMA recusou o ponto de partida do ajuste PSPL")
     b = f.fit_results["best_model"]
