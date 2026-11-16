@@ -5,6 +5,7 @@ from scipy.optimize import least_squares
 from . import config as C
 
 NB, TAU = 256, 4.0                      # bins e meia-largura da janela em unidades de tE
+VERSAO = 2                              # versão do pré-processamento, gravada em cada conjunto (2 = ajuste PSPL com limites físicos)
 LIM_U0, LIM_TE = (1e-3, 2.0), (1.0, 500.0)   # faixa física do ajuste PSPL (só usada se o ajuste livre sair dela)
 
 

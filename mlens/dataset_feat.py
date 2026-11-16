@@ -1,4 +1,4 @@
-"""Dataset com features de resíduo. Saída: X (N,3,256), sc (N,4), y (N,7), dchi2 (N,), planet (N,) = 1 se há planeta."""
+"""Dataset com features de resíduo. Saída: X (N,3,256), sc (N,4), y (N,7), dchi2 (N,), planet (N,) = 1 se há planeta, limitado (N,) = 1 se o ajuste PSPL precisou de limites."""
 import numpy as np
 from multiprocessing import Pool
 from . import config as C
@@ -14,11 +14,11 @@ def _one(args):
         p, data, _ = simulate_event_pylima(rng)
     else:
         p, data = simulate_event(rng, sample_params(rng, frac, p_null, null_vbm))
-    X, sc, d2, _ = featurize(data)
-    return X, sc, params_to_vec(p), d2, float(not p.get("null", False))
+    X, sc, d2, fit = featurize(data)
+    return X, sc, params_to_vec(p), d2, float(not p.get("null", False)), float(fit["limitado"])
 
 
 def build(n, seed0=C.SEED, workers=4, engine="vbm", frac=None, p_null=0.0, null_vbm=False):
     with Pool(workers) as pool:
         out = pool.map(_one, [(s, engine, frac, p_null, null_vbm) for s in range(seed0, seed0 + n)], chunksize=10)
-    return [np.stack([o[i] for o in out]) for i in range(5)]
+    return [np.stack([o[i] for o in out]) for i in range(6)]

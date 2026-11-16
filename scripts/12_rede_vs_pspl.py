@@ -46,6 +46,11 @@ if a.logq_max is not None:
     tag += f"_logq<{a.logq_max:g}"
 
 d = np.load(pred); y, ex = d["y"], d["d2"]
+LIMT = None
+if pathlib.Path(a.test).exists():
+    _t = np.load(a.test)
+    if "pspl_limitado" in _t.files and len(_t["y"]) == len(y) and np.allclose(_t["y"], y):
+        LIMT = _t["pspl_limitado"] > 0                              # eventos em que o ajuste PSPL livre divergiu e foi refeito com limites
 if "sc" in d.files:
     sc = d["sc"]
 else:                                                              # previsões antigas: escalares vêm do conjunto de teste
@@ -55,10 +60,12 @@ else:                                                              # previsões 
     sc = t["sc"]
 if "planet" in d.files:                                            # rede de detecção: só eventos com planeta
     k = d["planet"] > 0; y, ex, sc = y[k], ex[k], sc[k]; P = {kk: np.asarray(d[kk])[k] for kk in ("t0", "u0", "tE")}
+    LIMT = None if LIMT is None else LIMT[k]
 else:
     P = {kk: np.asarray(d[kk]) for kk in ("t0", "u0", "tE")}
 if a.logq_max is not None:
     k = y[:, 3] < a.logq_max; y, ex, sc = y[k], ex[k], sc[k]; P = {kk: v[k] for kk, v in P.items()}
+    LIMT = None if LIMT is None else LIMT[k]
 t0f, u0f, tEf = pspl_from_sc(sc); FIS = pspl_fisico(sc)
 
 lg = lambda v: np.log10(np.clip(np.asarray(v, float), 1e-6, None))
@@ -112,6 +119,16 @@ def analisa(m):
 
 
 R = {"arquivo": str(pred), "variaveis": UNID, "grupos": {g: analisa(m) for g, m in GRUPOS.items()}}
+if LIMT is not None:                                               # resumo dos eventos com ajuste PSPL refeito com limites
+    L = {"n": int(LIMT.sum()), "frac": float(LIMT.mean()), "frac_no_excesso>1000": float(LIMT[ex > 1000].mean()) if (ex > 1000).any() else None,
+         "frac_dos_limitados_com_excesso>1000": float((ex[LIMT] > 1000).mean()) if LIMT.any() else None}
+    for nome, (v, f, r) in VAR.items():
+        if LIMT.sum() >= 5:
+            L[nome] = dict(erro_mediano_pspl=float(np.median(np.abs(f - v)[LIMT])), erro_mediano_rede=float(np.median(np.abs(r - v)[LIMT])),
+                           frac_rede_melhor=float(np.mean((np.abs(r - v) < np.abs(f - v))[LIMT])))
+    R["pspl_limitado"] = L
+    print(f"\nAjuste PSPL refeito com limites em {L['n']} eventos ({100 * L['frac']:.1f}%): " + "  ".join(
+        f"{k_} {L[k_]['erro_mediano_pspl']:.3g} -> {L[k_]['erro_mediano_rede']:.3g}" for k_ in VAR if k_ in L))
 (ROOT / "models").mkdir(exist_ok=True)
 json.dump(R, open(ROOT / f"models/rede_vs_pspl_{tag}.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 

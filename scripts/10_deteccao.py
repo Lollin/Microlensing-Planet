@@ -42,6 +42,8 @@ lab = np.r_[np.ones(len(pp_pl)), np.zeros(len(pp_nu))]
 R = {"n_com_planeta": int(len(pp_pl)), "n_sem_planeta": int(len(pp_nu)),
      "AUC_rede": float(roc_auc_score(lab, np.r_[pp_pl, pp_nu])),
      "AUC_excesso_chi2": float(roc_auc_score(lab, np.r_[d2_pl, d2_nu])), "por_taxa_falso_positivo": {}}
+R["sem_planeta"] = dict(desvio_padrao_excesso_chi2=float(np.std(d2_nu)), mediana_p_planeta=float(np.median(pp_nu)))
+R["com_planeta"] = dict(mediana_p_planeta_excesso_menor_10=float(np.median(pp_pl[d2_pl <= 10])) if (d2_pl <= 10).any() else None)
 for fpr in (0.05, 0.01):
     linha = {}
     for nome, sp, sn in (("rede", pp_pl, pp_nu), ("excesso_chi2", d2_pl, d2_nu)):

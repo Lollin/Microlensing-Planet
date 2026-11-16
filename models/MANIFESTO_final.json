@@ -1,0 +1,187 @@
+{
+ "data": "2026-11-16T11:38:40",
+ "git_commit": "20e261c874a6e2465ea2aaf3892f16fe6d4ec373",
+ "git_tag": "20e261c",
+ "alteracoes_nao_commitadas": false,
+ "python": "3.12.10",
+ "plataforma": "Windows-11-10.0.26200-SP0",
+ "rapido": false,
+ "sementes_dados": {
+  "train_mix.npz": "42",
+  "train_null.npz": "100000",
+  "test_uniform.npz": "900000",
+  "test_null.npz": "910000",
+  "test_null_vbm.npz": "920000",
+  "test_null_indep.npz": "930000"
+ },
+ "treinos": {
+  "final": "--uchan --target x --delta --train-data data/processed/train_mix.npz --seed 0",
+  "final_s1": "--uchan --target x --delta --train-data data/processed/train_mix.npz --seed 1",
+  "abl_sem_u": "--delta --train-data data/processed/train_mix.npz --seed 0",
+  "abl_u": "--uchan --delta --train-data data/processed/train_mix.npz --seed 0",
+  "final_det": "--uchan --target x --delta --null --train-data data/processed/train_null.npz --null-test data/processed/test_null.npz --seed 0"
+ },
+ "comandos": [
+  {
+   "comando": "python scripts/01b_gerar_dataset_feat.py --n 30000 --caustic-frac 0.7 --seed 42 --workers 4 --out data/processed/train_mix.npz",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/01b_gerar_dataset_feat.py --n 30000 --caustic-frac 0.7 --p-null 0.2 --seed 100000 --workers 4 --out data/processed/train_null.npz",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/01b_gerar_dataset_feat.py --n 6000 --caustic-frac 0 --seed 900000 --workers 4 --out data/processed/test_uniform.npz",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/01b_gerar_dataset_feat.py --n 3000 --p-null 1 --seed 910000 --workers 4 --out data/processed/test_null.npz",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/01b_gerar_dataset_feat.py --n 3000 --p-null 1 --null-vbm --seed 920000 --workers 4 --out data/processed/test_null_vbm.npz",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/01b_gerar_dataset_feat.py --n 3000 --p-null 1 --seed 930000 --workers 4 --out data/processed/test_null_indep.npz",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --uchan --target x --delta --train-data data/processed/train_mix.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run final",
+   "status": "ok",
+   "segundos": 555
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --uchan --target x --delta --train-data data/processed/train_mix.npz --seed 1 --test-data data/processed/test_uniform.npz --epochs 30 --run final_s1",
+   "status": "ok",
+   "segundos": 595
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --delta --train-data data/processed/train_mix.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run abl_sem_u",
+   "status": "ok",
+   "segundos": 679
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --uchan --delta --train-data data/processed/train_mix.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run abl_u",
+   "status": "ok",
+   "segundos": 608
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --uchan --target x --delta --null --train-data data/processed/train_null.npz --null-test data/processed/test_null.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run final_det",
+   "status": "ok",
+   "segundos": 571
+  },
+  {
+   "comando": "python scripts/12_rede_vs_pspl.py --run final",
+   "status": "ok",
+   "segundos": 14
+  },
+  {
+   "comando": "python scripts/12_rede_vs_pspl.py --run abl_sem_u",
+   "status": "ok",
+   "segundos": 11
+  },
+  {
+   "comando": "python scripts/07_r2.py --pred data/processed/test_pred_uniform_final.npz --tag final",
+   "status": "ok",
+   "segundos": 4
+  },
+  {
+   "comando": "python scripts/07_r2.py --pred data/processed/test_pred_uniform_final_s1.npz --tag final_s1",
+   "status": "ok",
+   "segundos": 4
+  },
+  {
+   "comando": "python scripts/07_r2.py --pred data/processed/test_pred_uniform_abl_sem_u.npz --tag abl_sem_u",
+   "status": "ok",
+   "segundos": 4
+  },
+  {
+   "comando": "python scripts/07_r2.py --pred data/processed/test_pred_uniform_abl_u.npz --tag abl_u",
+   "status": "ok",
+   "segundos": 4
+  },
+  {
+   "comando": "python scripts/06_analise_s.py --run final",
+   "status": "ok",
+   "segundos": 4
+  },
+  {
+   "comando": "python scripts/15_regime_planetario.py --run final",
+   "status": "ok",
+   "segundos": 2
+  },
+  {
+   "comando": "python scripts/10_deteccao.py --run final_det --null-calib data/processed/test_null.npz",
+   "status": "ok",
+   "segundos": 3
+  },
+  {
+   "comando": "python scripts/10_deteccao.py --run final_det --null-file data/processed/test_null_vbm.npz --model models/cnn_final_det.pt --null-calib data/processed/test_null.npz",
+   "status": "ok",
+   "segundos": 7
+  },
+  {
+   "comando": "python scripts/10_deteccao.py --run final_det --null-calib data/processed/test_null.npz --logq-max -1.52",
+   "status": "ok",
+   "segundos": 3
+  },
+  {
+   "comando": "python scripts/11_avaliar_1l1s.py --run final_det --null-calib data/processed/test_null.npz --null-eval data/processed/test_null_indep.npz",
+   "status": "ok",
+   "segundos": 5
+  },
+  {
+   "comando": "python scripts/03b_figuras_cnn.py",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/08_degenerescencia_s.py",
+   "status": "pulado"
+  },
+  {
+   "comando": "python scripts/13_benchmark_pylima_v2.py --n 100 --workers 4 --model models/cnn_final.pt --out data/processed/benchmark_v2",
+   "status": "ok",
+   "segundos": 11368
+  },
+  {
+   "comando": "python scripts/14_resumo_benchmark_v2.py --dir data/processed/benchmark_v2",
+   "status": "ok",
+   "segundos": 9
+  },
+  {
+   "comando": "python scripts/05_ogle.py --event 2012-BLG-0406 --model models/cnn_final.pt",
+   "status": "ok",
+   "segundos": 57
+  },
+  {
+   "comando": "python scripts/05_ogle.py --event 2016-BLG-1195 --model models/cnn_final.pt",
+   "status": "ok",
+   "segundos": 29
+  }
+ ],
+ "sha256": {
+  "models\\cnn_2l1s.pt": "5da77e9a6257142f39fefbb8f0943c221c3af46b60bef8a690146ed1b3ac8722",
+  "models\\cnn_2l1s_v1.pt": "72176ae338e0fee5dd5d36cad95efb5cb55141b3f4fb4bc5c8dd364798d8c7bb",
+  "models\\cnn_abl_sem_u.pt": "40ca36f883de2c97b628a415875219277bae0a2ff4af2169982466adddf3feef",
+  "models\\cnn_abl_sem_u_rapido.pt": "03c0187d85fdcc174a9bd130f64e5590b8e0cc912ffc31a519dc70d1a7162e90",
+  "models\\cnn_abl_u.pt": "a018d1bc1c5a184c0f5f92daba6c64480b8cfc3e825457977390134dae89c76d",
+  "models\\cnn_abl_u_rapido.pt": "275fe1e5e1cfeb0d2845289d787161503f632ef6f8f4b0bad0cbdab6fb6fdfcc",
+  "models\\cnn_final.pt": "0c005af6aa1af8be949778b7c8a84e239b8a7120c03a103eaea840a5a64b46fb",
+  "models\\cnn_final_det.pt": "c071e16357d9151a69c4964e688ec9bf67b2d036c5f47fd1b716b7b89e77346d",
+  "models\\cnn_final_det_rapido.pt": "7bc29fc1d587a4b088beb4d9251f9c63e7c18587270f4142f4c5ed36e261321e",
+  "models\\cnn_final_rapido.pt": "fff5cfb439371542caaf0af0e4794371ed7181f93f474e795511a40118f3a6c7",
+  "models\\cnn_final_s1.pt": "c06a6dc75decfa71cf879818fb4451a709120076e9f64a5a4007c3702439f580",
+  "models\\cnn_final_s1_rapido.pt": "24be8704bcce921c0e1a47024e25305ed81c45cdbd2acd1d796bda4a53367573",
+  "models\\cnn_v2a.pt": "77caa3ddb21f81cc48b92dd9a0b9d76700d5a0215d81b95962d1cf79a95e6a9d",
+  "models\\cnn_v2b.pt": "c950dbaa55880e019287f600700124c9a766f2477972477040d87c88a0ff4d8a",
+  "models\\cnn_v2b_s1.pt": "6fc45f2f34dfd269d98f8d35986f7e87b572a276f980a8d94912331c5b13a162",
+  "models\\cnn_v3.pt": "cc019da8711cf9504d27abff28089a6fe760326367c81fb0d09e4bd3f8b6f1b6",
+  "data\\processed\\train_mix.npz": "dbc81596cde031769b04b32d8688be455ecdba9ce6dc48fb3cb7aff06eb5cc0a",
+  "data\\processed\\train_null.npz": "8d32c932dc0d13891c6fe9e6cf8a530b4a6d72bf19049b95aab3ba55c1ae0f45",
+  "data\\processed\\test_uniform.npz": "6daf9bc4ee28e6e1459bc6e2f3696f3d758ca0c59cbd0fccce725d6685c33702",
+  "data\\processed\\test_null.npz": "aa645d6540a6580da86b6d8365bae0b574dd361252d0cc3b8221834f5b1d6f32",
+  "data\\processed\\test_null_vbm.npz": "7b8483253a2bd743a5d5f630438065afea30bd34f836047a5014d18744afbd4f",
+  "data\\processed\\test_null_indep.npz": "9fdcbadf6155b62f603cb4fb8f76f589171eb62ea353cebee692f40a6cd11e3c"
+ }
+}

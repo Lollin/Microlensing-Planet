@@ -12,14 +12,21 @@ estão em `models/historico/` e **não** correspondem ao texto.
 pip install -r requirements.txt                 # + PyTorch: pip install torch
 python reproduzir.py --listar                   # mostra todos os comandos, sem rodar
 python reproduzir.py --rapido                   # teste de fumaça (~5 min): só confere se tudo funciona
-python reproduzir.py                            # dados + 5 treinos + análises (~4 h em CPU)
-python reproduzir.py --etapas benchmark         # benchmark com o pyLIMA (~2 h com --workers 4)
-python reproduzir.py --etapas ogle              # eventos reais do OGLE (precisa de internet)
+python reproduzir.py --benchmark --ogle         # TUDO: dados, 8 treinos, análises, benchmark, OGLE e LaTeX (~6 h em CPU)
+python reproduzir.py                            # sem o benchmark (~3 h) e sem os eventos do OGLE
+python reproduzir.py --etapas latex             # só regenera latex_tcc/ a partir dos JSON existentes
 ```
 
 Cada passo é pulado se a saída já existir; se algo falhar, corrija e rode o mesmo comando de novo.
-`--forcar` refaz tudo. Os conjuntos de dados (`data/`) não são versionados, mas são regenerados de forma idêntica
-pelas sementes abaixo.
+
+**Proteção contra arquivos antigos.** Cada conjunto de dados guarda a versão do pré-processamento e a semente com que foi
+gerado. Um arquivo com o mesmo nome, mas gerado por outra versão do código ou com outra semente, é regenerado, e todos os
+resultados que dependiam dele (modelos, previsões, métricas, benchmark) são movidos para `models/anterior_<data>/`. Assim
+os resultados em `models/` vêm sempre de uma única execução coerente; `--forcar` refaz tudo do zero.
+
+**Do resultado ao texto.** `scripts/16_latex.py` (etapa `latex`) lê os JSON de `models/` e escreve em `latex_tcc/`:
+`resultados/numeros.tex` (um `\newcommand` por número citado no texto), `resultados/tab_*.tex` (o corpo de cada tabela) e
+`figuras/*.jpg`. Para atualizar a monografia, envie essas duas pastas ao Overleaf. Nenhum número é digitado à mão.
 
 ## Sementes
 
@@ -33,9 +40,11 @@ Cada conjunto usa as sementes `s, s+1, …, s+n−1`, uma por evento, sem sobrep
 | Sem planeta (calibração) | `test_null.npz` | 3 000 | 910 000 | escolhe o limiar de 5% de falsos positivos |
 | Sem planeta (controle) | `test_null_vbm.npz` | 3 000 | 920 000 | VBMicrolensing com q = 1e-9, s = 10 |
 | Sem planeta (independente) | `test_null_indep.npz` | 3 000 | 930 000 | avaliação dos eventos 1L1S (Seção 4.7) |
+| Confirmação | `test_confirmacao.npz` | 6 000 | 950 000 | semente nova; avaliado uma única vez pela rede final (Seção 4.x) |
 | Benchmark pyLIMA | — | 100 | 2 026 | eventos simulados com o pyLIMA, com luz de mistura |
 
-Treinos: semente 0 (e 1 para a segunda semente), 30 épocas, AdamW, taxa máxima 2e-3, lotes de 128.
+Treinos: 30 épocas, AdamW, taxa máxima 2e-3, lotes de 128. Rede final e rede sem u(τ): sementes 0, 1 e 2 (os resultados
+principais são os da semente 0). Rede só com u(τ) e rede de detecção: semente 0.
 
 ## O que gera o quê
 
@@ -46,15 +55,17 @@ Treinos: semente 0 (e 1 para a segunda semente), 30 épocas, AdamW, taxa máxima
 | **Nova tabela: rede × ajuste PSPL** (tópico 2) | `12_rede_vs_pspl.py --run final` | `models/rede_vs_pspl_final.json`, `figures/fig_rede_vs_pspl_final.png` |
 | Figura 8 (erro × excesso de χ²) | `06_analise_s.py --run final` | `figures/fig_erro_vs_excesso_final.png` |
 | Figura 9 (sinal de log s) | `06_analise_s.py --run final` | `figures/fig_s_analise_final.png`, `models/analise_s_final.json` |
-| Tabela 5 (ablação) | `07_r2.py` nos runs `abl_sem_u`, `abl_u`, `final` | `models/r2_abl_sem_u.json`, `models/r2_abl_u.json`, `models/r2_final.json` |
-| Tabela 12 (duas sementes) | `07_r2.py` nos runs `final`, `final_s1` | `models/r2_final.json`, `models/r2_final_s1.json` |
+| Tabelas de ablação | `02b_treinar_cnn.py` nos runs `abl_sem_u[_s1,_s2]`, `abl_u`, `final[_s1,_s2]` | `models/metrics_cnn_<run>.json` |
+| Tabela das sementes (Apêndice B) | `02b_treinar_cnn.py` e `12_rede_vs_pspl.py` nos runs `final`, `final_s1`, `final_s2` | `models/metrics_cnn_final*.json`, `models/rede_vs_pspl_final*.json` |
 | Regime planetário, q < 0,03 (tópico 3) | `15_regime_planetario.py --run final` | `models/regime_planetario_final.json` |
 | Tabela 6, Figura 10 (detecção) | `10_deteccao.py --run final_det` | `models/deteccao_final_det.json`, `figures/fig_deteccao_final_det.png` |
 | Detecção só no regime planetário, q < 0,03 (tópico 3) | `10_deteccao.py --logq-max -1.52` | `models/deteccao_final_det_logq-1.52.json` |
 | Controle da detecção | `10_deteccao.py --null-file test_null_vbm.npz` | `models/deteccao_final_det_test_null_vbm.json` |
 | Tabela 7, Figura 11 (eventos 1L1S) | `11_avaliar_1l1s.py --run final_det` | `models/avaliacao_1l1s_final_det.json`, `figures/fig_1l1s_final_det.png` |
 | Tabela 8, Figura 12 (pyLIMA) | `13_benchmark_pylima_v2.py` + `14_resumo_benchmark_v2.py` | `models/benchmark_v2_resumo.json`, `figures/fig_benchmark_v2.png` |
-| Tabela 9, Figura 13 (OGLE) | `05_ogle.py --event 2012-BLG-0406` (e 2016-BLG-1195) | terminal, `figures/ogle_*.png` |
+| Tabela dos eventos reais (OGLE) | `05_ogle.py --event 2012-BLG-0406` (e 2016-BLG-1195) | `models/ogle_*.json`, `figures/ogle_*.png` |
+| Conjunto de confirmação | `17_confirmacao.py` | `models/confirmacao_final.json`, `models/rede_vs_pspl_confirmacao_final.json` |
+| Todos os números e tabelas do texto | `16_latex.py` | `latex_tcc/resultados/`, `latex_tcc/figuras/` |
 | Figura 3 (topologias) | `03b_figuras_cnn.py` | `figures/fig_topologias.png` |
 | Figura 4 (degenerescência) | `08_degenerescencia_s.py` | `figures/fig_degenerescencia_s.png` |
 | Figura 6 (evento exemplo) | `03b_figuras_cnn.py` | `figures/fig_evento.png` |

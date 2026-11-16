@@ -4,7 +4,7 @@ pela rede; (3) ajusta em dois ramos (close/wide, + ressonante); (4) critério de
 Ex.:   python scripts/05_ogle.py --event 2019-BLG-0123 --model models/cnn_2l1s.pt
        python scripts/05_ogle.py --file meu_evento/phot.dat --model models/cnn_2l1s.pt          (arquivo baixado à mão)
 ATENÇÃO: a política do OGLE pede contato com a equipe para uso em PUBLICAÇÃO dos dados EWS. Confirme as URLs no site do OGLE."""
-import sys, pathlib, argparse, io, numpy as np
+import sys, pathlib, argparse, io, json, numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from mlens.features import featurize, pspl_fit
@@ -85,6 +85,16 @@ if __name__ == "__main__":
         else:
             print(f"Ramo NÃO definido (degenerescência close/wide): Δχ² entre ramos = {r['dchi2_outro_ramo']:.1f}")
     nome = (a.event or pathlib.Path(a.file).stem).replace("/", "_")
+    J = dict(evento=nome, N_total=int(len(t)), N_janela=int(w.sum()), fator_erros=k, limiar=a.limiar,
+             pspl=dict(t0=float(base[0]), u0=float(fit["u0"]), tE=float(fit["tE"]), excesso_chi2=float(d2), chi2_pylima=float(c_pspl)))
+    if not a.no_nn:
+        J["rede"] = dict(abs_logs=al_s, s_wide=10 ** al_s, s_close=10 ** -al_s, q=q0, alpha=al0, p_wide=float(P["p_wide"][0]),
+                         t0=float(P["t0"][0]) + tref, u0=float(P["u0"][0]), tE=float(P["tE"][0]))
+    if r is not None:
+        J["ajuste"] = {kk: (float(v) if isinstance(v, (int, float, np.floating)) else v) for kk, v in r.items() if kk not in ("limites",)}
+        J["ajuste"].update(chi2N=float(r["chi2"] / int(w.sum())), dchi2_pspl=float(c_pspl - r["chi2"]), detectado=bool(c_pspl - r["chi2"] > a.limiar))
+    pathlib.Path("models").mkdir(exist_ok=True)
+    json.dump(J, open(f"models/ogle_{nome}.json", "w", encoding="utf-8"), indent=1, ensure_ascii=False, default=float)
     pathlib.Path("figures").mkdir(exist_ok=True)
     plt.figure(figsize=(9, 4)); plt.errorbar(t - 2450000, m, e * k, fmt=".", ms=3, alpha=.5); plt.gca().invert_yaxis()
     plt.xlim((base[0] - 2450000) - a.janela * fit["tE"], (base[0] - 2450000) + a.janela * fit["tE"])

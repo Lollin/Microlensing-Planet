@@ -38,6 +38,7 @@ for nm, m, col in [("todos", np.ones_like(lab), "#9bb7d4"), (r"excesso$>100$", e
     idx = o[m[o]]; cov = np.arange(1, len(idx) + 1) / len(idx)
     cum = np.cumsum(pred[idx] == lab[idx]) / np.arange(1, len(idx) + 1)
     ax[2].plot(cov[20:], cum[20:], label=nm, color=col)
+    out.setdefault("acc_20pct_mais_confiantes", {})["todos" if col == "#9bb7d4" else "excesso>100"] = float(cum[max(int(0.2 * len(idx)) - 1, 0)])
 ax[2].axhline(.5, color="k", ls="--", lw=1); ax[2].set_xlabel("fração de eventos mantidos (mais confiantes primeiro)")
 ax[2].set_ylabel("acerto do sinal"); ax[2].set_ylim(.4, 1); ax[2].legend(); ax[2].set_title("(c) Classificação seletiva")
 plt.tight_layout(); plt.savefig(f"figures/fig_s_analise_{RUN}.png", dpi=200); plt.close()
