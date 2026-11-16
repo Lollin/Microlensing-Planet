@@ -64,6 +64,8 @@ Treinos: semente 0 (e 1 para a segunda semente), 30 épocas, AdamW, taxa máxima
 1. **t0, u0, tE como correção ao ajuste PSPL** (`--delta`). A rede prevê δt0 = (t0 − t0_PSPL)/tE_PSPL,
    δu0 = log10(u0/u0_PSPL) e δtE = log10(tE/tE_PSPL), comprimidos por asinh. Saída zero = repetir o ajuste.
    A referência é o ajuste PSPL limitado a uma faixa física, porque em ~8% dos eventos o ajuste diverge.
+   O ajuste PSPL livre (Levenberg–Marquardt) é refeito com limites físicos (u0 em [0,001; 2], tE em [1; 500] d) quando
+   sai dessa faixa, o que acontecia em ~8% do teste uniforme e ~18% do treino (`mlens/features.py`).
 2. **Comparação direta com o ajuste PSPL** (`12_rede_vs_pspl.py`): erro dos dois estimadores no mesmo evento,
    teste de Wilcoxon pareado e a fração da correção aplicada, β.
 3. **Eventos 1L1S**: o limiar é escolhido em `test_null.npz` e a avaliação é feita em `test_null_indep.npz`.

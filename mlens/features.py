@@ -5,6 +5,7 @@ from scipy.optimize import least_squares
 from . import config as C
 
 NB, TAU = 256, 4.0                      # bins e meia-largura da janela em unidades de tE
+LIM_U0, LIM_TE = (1e-3, 2.0), (1.0, 500.0)   # faixa física do ajuste PSPL (só usada se o ajuste livre sair dela)
 
 
 def _A(t, t0, u0, tE):
@@ -34,8 +35,14 @@ def pspl_fit(t, f, s, robust=False):
             if best is None or c < best[0]: best = (c, q)
     sol = (least_squares(res, best[1], method="trf", loss="soft_l1", f_scale=3.0, max_nfev=200) if robust
            else least_squares(res, best[1], method="lm", max_nfev=60))
-    q = sol.x; m, th = _lin(_A(t, q[0], np.exp(q[1]), np.exp(q[2])), f, w)
-    return dict(t0=q[0], u0=np.exp(q[1]), tE=np.exp(q[2]), fs=th[0], fb=th[1], model=m, chi2=float(np.sum(((f - m) / s) ** 2)))
+    q = sol.x; limitado = False
+    if not robust and not (t.min() <= q[0] <= t.max() and LIM_U0[0] <= np.exp(q[1]) <= LIM_U0[1] and LIM_TE[0] <= np.exp(q[2]) <= LIM_TE[1]):
+        # O ajuste livre divergiu (tipicamente tE enorme e u0 ~ 0, compensados por fluxo de fonte ~ 0: a degenerescência com a
+        # mistura, agravada pela anomalia). Refaz com limites físicos, partindo do melhor ponto da grade.
+        lo = [t.min(), np.log(LIM_U0[0]), np.log(LIM_TE[0])]; hi = [t.max(), np.log(LIM_U0[1]), np.log(LIM_TE[1])]
+        sol = least_squares(res, np.clip(best[1], lo, hi), method="trf", bounds=(lo, hi), max_nfev=200); q = sol.x; limitado = True
+    m, th = _lin(_A(t, q[0], np.exp(q[1]), np.exp(q[2])), f, w)
+    return dict(t0=q[0], u0=np.exp(q[1]), tE=np.exp(q[2]), fs=th[0], fb=th[1], model=m, chi2=float(np.sum(((f - m) / s) ** 2)), limitado=limitado)
 
 
 def featurize(data):
