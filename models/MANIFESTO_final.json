@@ -1,7 +1,7 @@
 {
- "data": "2026-11-16T11:38:40",
- "git_commit": "20e261c874a6e2465ea2aaf3892f16fe6d4ec373",
- "git_tag": "20e261c",
+ "data": "2026-11-16T23:24:47",
+ "git_commit": "703c3a746f7f1db3ed77a1a40fa20bce80c08364",
+ "git_tag": "703c3a7",
  "alteracoes_nao_commitadas": false,
  "python": "3.12.10",
  "plataforma": "Windows-11-10.0.26200-SP0",
@@ -12,72 +12,111 @@
   "test_uniform.npz": "900000",
   "test_null.npz": "910000",
   "test_null_vbm.npz": "920000",
-  "test_null_indep.npz": "930000"
+  "test_null_indep.npz": "930000",
+  "test_confirmacao.npz": "950000"
+ },
+ "conjuntos_verificados": {
+  "train_mix.npz": true,
+  "train_null.npz": true,
+  "test_uniform.npz": true,
+  "test_null.npz": true,
+  "test_null_vbm.npz": true,
+  "test_null_indep.npz": true,
+  "test_confirmacao.npz": true
  },
  "treinos": {
   "final": "--uchan --target x --delta --train-data data/processed/train_mix.npz --seed 0",
   "final_s1": "--uchan --target x --delta --train-data data/processed/train_mix.npz --seed 1",
+  "final_s2": "--uchan --target x --delta --train-data data/processed/train_mix.npz --seed 2",
   "abl_sem_u": "--delta --train-data data/processed/train_mix.npz --seed 0",
+  "abl_sem_u_s1": "--delta --train-data data/processed/train_mix.npz --seed 1",
+  "abl_sem_u_s2": "--delta --train-data data/processed/train_mix.npz --seed 2",
   "abl_u": "--uchan --delta --train-data data/processed/train_mix.npz --seed 0",
   "final_det": "--uchan --target x --delta --null --train-data data/processed/train_null.npz --null-test data/processed/test_null.npz --seed 0"
  },
  "comandos": [
   {
    "comando": "python scripts/01b_gerar_dataset_feat.py --n 30000 --caustic-frac 0.7 --seed 42 --workers 4 --out data/processed/train_mix.npz",
-   "status": "pulado"
+   "status": "ok",
+   "segundos": 604
   },
   {
    "comando": "python scripts/01b_gerar_dataset_feat.py --n 30000 --caustic-frac 0.7 --p-null 0.2 --seed 100000 --workers 4 --out data/processed/train_null.npz",
-   "status": "pulado"
+   "status": "ok",
+   "segundos": 526
   },
   {
    "comando": "python scripts/01b_gerar_dataset_feat.py --n 6000 --caustic-frac 0 --seed 900000 --workers 4 --out data/processed/test_uniform.npz",
-   "status": "pulado"
+   "status": "ok",
+   "segundos": 75
   },
   {
    "comando": "python scripts/01b_gerar_dataset_feat.py --n 3000 --p-null 1 --seed 910000 --workers 4 --out data/processed/test_null.npz",
-   "status": "pulado"
+   "status": "ok",
+   "segundos": 15
   },
   {
    "comando": "python scripts/01b_gerar_dataset_feat.py --n 3000 --p-null 1 --null-vbm --seed 920000 --workers 4 --out data/processed/test_null_vbm.npz",
-   "status": "pulado"
+   "status": "ok",
+   "segundos": 23
   },
   {
    "comando": "python scripts/01b_gerar_dataset_feat.py --n 3000 --p-null 1 --seed 930000 --workers 4 --out data/processed/test_null_indep.npz",
-   "status": "pulado"
+   "status": "ok",
+   "segundos": 15
+  },
+  {
+   "comando": "python scripts/01b_gerar_dataset_feat.py --n 6000 --caustic-frac 0 --seed 950000 --workers 4 --out data/processed/test_confirmacao.npz",
+   "status": "ok",
+   "segundos": 75
   },
   {
    "comando": "python scripts/02b_treinar_cnn.py --uchan --target x --delta --train-data data/processed/train_mix.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run final",
    "status": "ok",
-   "segundos": 555
+   "segundos": 559
   },
   {
    "comando": "python scripts/02b_treinar_cnn.py --uchan --target x --delta --train-data data/processed/train_mix.npz --seed 1 --test-data data/processed/test_uniform.npz --epochs 30 --run final_s1",
    "status": "ok",
-   "segundos": 595
+   "segundos": 594
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --uchan --target x --delta --train-data data/processed/train_mix.npz --seed 2 --test-data data/processed/test_uniform.npz --epochs 30 --run final_s2",
+   "status": "ok",
+   "segundos": 621
   },
   {
    "comando": "python scripts/02b_treinar_cnn.py --delta --train-data data/processed/train_mix.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run abl_sem_u",
    "status": "ok",
-   "segundos": 679
+   "segundos": 572
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --delta --train-data data/processed/train_mix.npz --seed 1 --test-data data/processed/test_uniform.npz --epochs 30 --run abl_sem_u_s1",
+   "status": "ok",
+   "segundos": 602
+  },
+  {
+   "comando": "python scripts/02b_treinar_cnn.py --delta --train-data data/processed/train_mix.npz --seed 2 --test-data data/processed/test_uniform.npz --epochs 30 --run abl_sem_u_s2",
+   "status": "ok",
+   "segundos": 637
   },
   {
    "comando": "python scripts/02b_treinar_cnn.py --uchan --delta --train-data data/processed/train_mix.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run abl_u",
    "status": "ok",
-   "segundos": 608
+   "segundos": 596
   },
   {
    "comando": "python scripts/02b_treinar_cnn.py --uchan --target x --delta --null --train-data data/processed/train_null.npz --null-test data/processed/test_null.npz --seed 0 --test-data data/processed/test_uniform.npz --epochs 30 --run final_det",
    "status": "ok",
-   "segundos": 571
+   "segundos": 640
   },
   {
-   "comando": "python scripts/12_rede_vs_pspl.py --run final",
+   "comando": "python scripts/12_rede_vs_pspl.py --run final --test data/processed/test_uniform.npz",
    "status": "ok",
-   "segundos": 14
+   "segundos": 4632
   },
   {
-   "comando": "python scripts/12_rede_vs_pspl.py --run abl_sem_u",
+   "comando": "python scripts/12_rede_vs_pspl.py --run abl_sem_u --test data/processed/test_uniform.npz",
    "status": "ok",
    "segundos": 11
   },
@@ -92,6 +131,26 @@
    "segundos": 4
   },
   {
+   "comando": "python scripts/07_r2.py --pred data/processed/test_pred_uniform_final_s2.npz --tag final_s2",
+   "status": "ok",
+   "segundos": 4
+  },
+  {
+   "comando": "python scripts/12_rede_vs_pspl.py --run final_s1 --test data/processed/test_uniform.npz",
+   "status": "ok",
+   "segundos": 11
+  },
+  {
+   "comando": "python scripts/12_rede_vs_pspl.py --run final_s2 --test data/processed/test_uniform.npz",
+   "status": "ok",
+   "segundos": 11
+  },
+  {
+   "comando": "python scripts/12_rede_vs_pspl.py --run final_det --test data/processed/test_uniform.npz",
+   "status": "ok",
+   "segundos": 11
+  },
+  {
    "comando": "python scripts/07_r2.py --pred data/processed/test_pred_uniform_abl_sem_u.npz --tag abl_sem_u",
    "status": "ok",
    "segundos": 4
@@ -104,7 +163,7 @@
   {
    "comando": "python scripts/06_analise_s.py --run final",
    "status": "ok",
-   "segundos": 4
+   "segundos": 6
   },
   {
    "comando": "python scripts/15_regime_planetario.py --run final",
@@ -119,7 +178,7 @@
   {
    "comando": "python scripts/10_deteccao.py --run final_det --null-file data/processed/test_null_vbm.npz --model models/cnn_final_det.pt --null-calib data/processed/test_null.npz",
    "status": "ok",
-   "segundos": 7
+   "segundos": 6
   },
   {
    "comando": "python scripts/10_deteccao.py --run final_det --null-calib data/processed/test_null.npz --logq-max -1.52",
@@ -132,6 +191,11 @@
    "segundos": 5
   },
   {
+   "comando": "python scripts/17_confirmacao.py --run final --test data/processed/test_confirmacao.npz",
+   "status": "ok",
+   "segundos": 21
+  },
+  {
    "comando": "python scripts/03b_figuras_cnn.py",
    "status": "pulado"
   },
@@ -142,12 +206,12 @@
   {
    "comando": "python scripts/13_benchmark_pylima_v2.py --n 100 --workers 4 --model models/cnn_final.pt --out data/processed/benchmark_v2",
    "status": "ok",
-   "segundos": 11368
+   "segundos": 14505
   },
   {
    "comando": "python scripts/14_resumo_benchmark_v2.py --dir data/processed/benchmark_v2",
    "status": "ok",
-   "segundos": 9
+   "segundos": 10
   },
   {
    "comando": "python scripts/05_ogle.py --event 2012-BLG-0406 --model models/cnn_final.pt",
@@ -157,31 +221,48 @@
   {
    "comando": "python scripts/05_ogle.py --event 2016-BLG-1195 --model models/cnn_final.pt",
    "status": "ok",
-   "segundos": 29
+   "segundos": 28
+  },
+  {
+   "comando": "python scripts/16_latex.py",
+   "status": "ok",
+   "segundos": 2
+  },
+  {
+   "comando": "python scripts/16_latex.py",
+   "status": "ok",
+   "segundos": 1
   }
  ],
  "sha256": {
   "models\\cnn_2l1s.pt": "5da77e9a6257142f39fefbb8f0943c221c3af46b60bef8a690146ed1b3ac8722",
   "models\\cnn_2l1s_v1.pt": "72176ae338e0fee5dd5d36cad95efb5cb55141b3f4fb4bc5c8dd364798d8c7bb",
-  "models\\cnn_abl_sem_u.pt": "40ca36f883de2c97b628a415875219277bae0a2ff4af2169982466adddf3feef",
-  "models\\cnn_abl_sem_u_rapido.pt": "03c0187d85fdcc174a9bd130f64e5590b8e0cc912ffc31a519dc70d1a7162e90",
-  "models\\cnn_abl_u.pt": "a018d1bc1c5a184c0f5f92daba6c64480b8cfc3e825457977390134dae89c76d",
-  "models\\cnn_abl_u_rapido.pt": "275fe1e5e1cfeb0d2845289d787161503f632ef6f8f4b0bad0cbdab6fb6fdfcc",
-  "models\\cnn_final.pt": "0c005af6aa1af8be949778b7c8a84e239b8a7120c03a103eaea840a5a64b46fb",
-  "models\\cnn_final_det.pt": "c071e16357d9151a69c4964e688ec9bf67b2d036c5f47fd1b716b7b89e77346d",
-  "models\\cnn_final_det_rapido.pt": "7bc29fc1d587a4b088beb4d9251f9c63e7c18587270f4142f4c5ed36e261321e",
-  "models\\cnn_final_rapido.pt": "fff5cfb439371542caaf0af0e4794371ed7181f93f474e795511a40118f3a6c7",
-  "models\\cnn_final_s1.pt": "c06a6dc75decfa71cf879818fb4451a709120076e9f64a5a4007c3702439f580",
-  "models\\cnn_final_s1_rapido.pt": "24be8704bcce921c0e1a47024e25305ed81c45cdbd2acd1d796bda4a53367573",
+  "models\\cnn_abl_sem_u.pt": "f2a444ab95424abf19b9b23a8a30c62c470aa61234601e4e8cc4dbe690408b01",
+  "models\\cnn_abl_sem_u_rapido.pt": "7c5448c92b60ee9ecd46a6503f0573484f6c04905ceeb2b6701a63873502f94f",
+  "models\\cnn_abl_sem_u_s1.pt": "b6d424054c1d535ebe52943a25745d4ee89ff7a89f97e50e11f13f5c9766f2ce",
+  "models\\cnn_abl_sem_u_s1_rapido.pt": "43938035180817afd2bdd20af6cb721177f601242c5c6656dcac625c422459f6",
+  "models\\cnn_abl_sem_u_s2.pt": "e6fa9a319d9887a4d2e37c08845ae53954c9bbb23488b01660c9298c8c161ec3",
+  "models\\cnn_abl_sem_u_s2_rapido.pt": "afc25bb2de7ea467600a0ba14b5ed3b749c05146459b739d709d30868a5b8d94",
+  "models\\cnn_abl_u.pt": "8961cb1c96c6999acf81f1cad37ad756c04b00278df6ae9be8a552941238b0ba",
+  "models\\cnn_abl_u_rapido.pt": "d51f85d326d446c4a660aaf73e42010b68da8b01badae0ba6c0ff87e05516083",
+  "models\\cnn_final.pt": "a79de3e3ceb00a16221b2125759c231c41cd0c813bfb82338ff7eb6e91667639",
+  "models\\cnn_final_det.pt": "5d96a4865d9fdf6df8d400cc9db6642b69ae53fecc6500da09eb59dff46d1d00",
+  "models\\cnn_final_det_rapido.pt": "2e5d0a00214b286e063cf30de88fa7e528346e458a4904049355a6ea55af9b45",
+  "models\\cnn_final_rapido.pt": "e79b46718cdc7720638e9c48e8ec881d35de212bfdd505fa8b712fd740d1786b",
+  "models\\cnn_final_s1.pt": "e067707699bd13128af0ab3eb819211772304057412c4898c35552098d34fd3d",
+  "models\\cnn_final_s1_rapido.pt": "8c80daa228b545411cedd1cf6ba38a35eb079d3f28a48a0c2025a4e1ce1bb6e9",
+  "models\\cnn_final_s2.pt": "cfff7d45ae67653ace06c5dcaaf4f525fef42f5b441e57030b67d504bab10c5f",
+  "models\\cnn_final_s2_rapido.pt": "c1ff72910e2329f06ea09459509e6a42a40184f4e773bf100e2ef2828b75248a",
   "models\\cnn_v2a.pt": "77caa3ddb21f81cc48b92dd9a0b9d76700d5a0215d81b95962d1cf79a95e6a9d",
   "models\\cnn_v2b.pt": "c950dbaa55880e019287f600700124c9a766f2477972477040d87c88a0ff4d8a",
   "models\\cnn_v2b_s1.pt": "6fc45f2f34dfd269d98f8d35986f7e87b572a276f980a8d94912331c5b13a162",
   "models\\cnn_v3.pt": "cc019da8711cf9504d27abff28089a6fe760326367c81fb0d09e4bd3f8b6f1b6",
-  "data\\processed\\train_mix.npz": "dbc81596cde031769b04b32d8688be455ecdba9ce6dc48fb3cb7aff06eb5cc0a",
-  "data\\processed\\train_null.npz": "8d32c932dc0d13891c6fe9e6cf8a530b4a6d72bf19049b95aab3ba55c1ae0f45",
-  "data\\processed\\test_uniform.npz": "6daf9bc4ee28e6e1459bc6e2f3696f3d758ca0c59cbd0fccce725d6685c33702",
-  "data\\processed\\test_null.npz": "aa645d6540a6580da86b6d8365bae0b574dd361252d0cc3b8221834f5b1d6f32",
-  "data\\processed\\test_null_vbm.npz": "7b8483253a2bd743a5d5f630438065afea30bd34f836047a5014d18744afbd4f",
-  "data\\processed\\test_null_indep.npz": "9fdcbadf6155b62f603cb4fb8f76f589171eb62ea353cebee692f40a6cd11e3c"
+  "data\\processed\\train_mix.npz": "dbbe0b75ea012018369378c69e73b796306b82517b0d1a75d0576f71f8d828c1",
+  "data\\processed\\train_null.npz": "888db8fa71966307c39ffb61d6cf9cb8d021096800a6b6bf50c55bce1e297dee",
+  "data\\processed\\test_uniform.npz": "95f2bce95583835dbc068b7377cfad4f7bc64c7e54cd243887191d33a917cb88",
+  "data\\processed\\test_null.npz": "0a2e7a114baa319e0b8a14e83aaedab87bd26889aad3dd4556f8e2fd82411182",
+  "data\\processed\\test_null_vbm.npz": "668110c79da909ae2be828835d5bc366f42dc1d72411cc5be36fd260b36318c1",
+  "data\\processed\\test_null_indep.npz": "5871d9996009a2c3983483934030a8bee4fcceb3d2b31554b6fbdd65c8e45055",
+  "data\\processed\\test_confirmacao.npz": "b74f008b82bea48dc7d113e529f2a18d18b95f6bec43ae6795fa1826dcbea599"
  }
 }

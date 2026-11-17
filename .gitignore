@@ -17,3 +17,5 @@ models/*.pt
 *_rapido*
 models/anterior_*/
 !models/cnn_final_s2.pt
+!models/cnn_abl_sem_u_s1.pt
+!models/cnn_abl_sem_u_s2.pt

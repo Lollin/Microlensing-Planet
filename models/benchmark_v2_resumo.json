@@ -17,12 +17,12 @@
     ]
    },
    "fisica": {
-    "k": 75,
+    "k": 74,
     "n": 100,
-    "frac": 0.75,
+    "frac": 0.74,
     "ic95": [
-     0.6569535362992417,
-     0.8245490599627573
+     0.6462882736813838,
+     0.8159542187301354
     ]
    },
    "chi2N_menor_1_5": {
@@ -43,62 +43,62 @@
      0.9879251769787817
     ]
    },
-   "tempo_mediano_s": 4.402357220649719,
-   "tempo_medio_s": 12.67066513299942,
-   "custo_por_sucesso_conv_s": 14.906664862352258,
-   "custo_por_sucesso_fis_s": 16.89422017733256,
+   "tempo_mediano_s": 4.102275848388672,
+   "tempo_medio_s": 10.267703316211701,
+   "custo_por_sucesso_conv_s": 12.07965096024906,
+   "custo_por_sucesso_fis_s": 13.875274751637432,
    "n_ajustes_medio": 1.0,
    "erro_mediano_logq": 0.006574010210615322,
-   "erro_mediano_abslogs": 0.0003154543868408993,
-   "erro_mediano_alpha_graus": 0.04048954538662902
+   "erro_mediano_abslogs": 0.0003154543181705244,
+   "erro_mediano_alpha_graus": 0.03721035946332183
   },
   "rede_1ramo": {
    "sem_resultado": 0,
    "falhas_de_ajuste": 0,
    "convergencia": {
-    "k": 23,
+    "k": 24,
     "n": 100,
-    "frac": 0.23,
+    "frac": 0.24,
     "ic95": [
-     0.15843154746876406,
-     0.32154564856827694
+     0.16691211265459965,
+     0.3323251872329213
     ]
    },
    "fisica": {
-    "k": 14,
+    "k": 10,
     "n": 100,
-    "frac": 0.14,
+    "frac": 0.1,
     "ic95": [
-     0.08526265754464905,
-     0.22137360383807236
+     0.05522854161313613,
+     0.1743673043676654
     ]
    },
    "chi2N_menor_1_5": {
-    "k": 29,
+    "k": 28,
     "n": 100,
-    "frac": 0.29,
+    "frac": 0.28,
     "ic95": [
-     0.21014706973984146,
-     0.38539074940007934
+     0.2013955916759837,
+     0.37488212361345724
     ]
    },
    "acerto_sinal_logs_entre_convergidos": {
-    "k": 15,
-    "n": 23,
-    "frac": 0.6521739130434783,
+    "k": 17,
+    "n": 24,
+    "frac": 0.7083333333333334,
     "ic95": [
-     0.4488997690689164,
-     0.8118894536301776
+     0.508319363412903,
+     0.8508553966583573
     ]
    },
-   "tempo_mediano_s": 12.462368369102478,
-   "tempo_medio_s": 25.726323661804198,
-   "custo_por_sucesso_conv_s": 111.85358113827913,
-   "custo_por_sucesso_fis_s": 183.75945472717285,
+   "tempo_mediano_s": 15.181697249412537,
+   "tempo_medio_s": 32.3614992237091,
+   "custo_por_sucesso_conv_s": 134.83958009878793,
+   "custo_por_sucesso_fis_s": 323.6149922370911,
    "n_ajustes_medio": 1.0,
-   "erro_mediano_logq": 0.44334189096307797,
-   "erro_mediano_abslogs": 0.04812280368270934,
-   "erro_mediano_alpha_graus": 30.25553471922682
+   "erro_mediano_logq": 0.4465032365061111,
+   "erro_mediano_abslogs": 0.06492858833391062,
+   "erro_mediano_alpha_graus": 18.663791625085864
   },
   "rede_2ramos": {
    "sem_resultado": 0,
@@ -113,108 +113,108 @@
     ]
    },
    "fisica": {
-    "k": 17,
+    "k": 14,
     "n": 100,
-    "frac": 0.17,
+    "frac": 0.14,
     "ic95": [
-     0.10893476059773155,
-     0.25548181233642975
+     0.08526265754464905,
+     0.22137360383807236
     ]
    },
    "chi2N_menor_1_5": {
-    "k": 34,
+    "k": 32,
     "n": 100,
-    "frac": 0.34,
+    "frac": 0.32,
     "ic95": [
-     0.25461379497543,
-     0.43722454341689065
+     0.2366901081545688,
+     0.4166280225367919
     ]
    },
    "acerto_sinal_logs_entre_convergidos": {
-    "k": 19,
+    "k": 20,
     "n": 27,
-    "frac": 0.7037037037037037,
+    "frac": 0.7407407407407407,
     "ic95": [
-     0.515189666191624,
-     0.8414714668235244
+     0.553210695973843,
+     0.8682979157713322
     ]
    },
-   "tempo_mediano_s": 41.61684024333954,
-   "tempo_medio_s": 67.3435519528389,
-   "custo_por_sucesso_conv_s": 249.42056278829222,
-   "custo_por_sucesso_fis_s": 396.1385408990523,
-   "n_ajustes_medio": 2.37,
-   "erro_mediano_logq": 0.3522995025823299,
-   "erro_mediano_abslogs": 0.04380952845410538,
-   "erro_mediano_alpha_graus": 30.150865462392936
+   "tempo_mediano_s": 43.80061221122742,
+   "tempo_medio_s": 86.71949435710907,
+   "custo_por_sucesso_conv_s": 321.1833124337373,
+   "custo_por_sucesso_fis_s": 619.4249596936362,
+   "n_ajustes_medio": 2.3,
+   "erro_mediano_logq": 0.381760131686414,
+   "erro_mediano_abslogs": 0.05309720426251318,
+   "erro_mediano_alpha_graus": 17.367463444367935
   },
   "cega_mesmo_orcamento": {
    "sem_resultado": 0,
    "falhas_de_ajuste": 0,
    "convergencia": {
-    "k": 27,
+    "k": 30,
     "n": 100,
-    "frac": 0.27,
+    "frac": 0.3,
     "ic95": [
-     0.1926946091766482,
-     0.3643230022623127
+     0.21894753866228117,
+     0.39585038432811953
     ]
    },
    "fisica": {
-    "k": 11,
+    "k": 13,
     "n": 100,
-    "frac": 0.11,
+    "frac": 0.13,
     "ic95": [
-     0.06254131955225126,
-     0.18631463027903022
+     0.07757093858414264,
+     0.20980521894809878
     ]
    },
    "chi2N_menor_1_5": {
-    "k": 31,
+    "k": 32,
     "n": 100,
-    "frac": 0.31,
+    "frac": 0.32,
     "ic95": [
-     0.22779563206132378,
-     0.40626239477955695
+     0.2366901081545688,
+     0.4166280225367919
     ]
    },
    "acerto_sinal_logs_entre_convergidos": {
-    "k": 14,
-    "n": 27,
-    "frac": 0.5185185185185185,
+    "k": 15,
+    "n": 30,
+    "frac": 0.5,
     "ic95": [
-     0.3398532458621043,
-     0.6925704935029092
+     0.33153851227173764,
+     0.6684614877282624
     ]
    },
-   "tempo_mediano_s": 45.726097106933594,
-   "tempo_medio_s": 86.73762927293778,
-   "custo_por_sucesso_conv_s": 321.2504787886584,
-   "custo_por_sucesso_fis_s": 788.5239024812525,
-   "n_ajustes_medio": 2.37,
-   "erro_mediano_logq": 0.5513947655139295,
-   "erro_mediano_abslogs": 0.060052912653541096,
-   "erro_mediano_alpha_graus": 109.4097931892158
+   "tempo_mediano_s": 48.6091912984848,
+   "tempo_medio_s": 132.68728143453598,
+   "custo_por_sucesso_conv_s": 442.29093811511996,
+   "custo_por_sucesso_fis_s": 1020.6713956502767,
+   "n_ajustes_medio": 2.3,
+   "erro_mediano_logq": 0.4328450187425821,
+   "erro_mediano_abslogs": 0.06243579753577921,
+   "erro_mediano_alpha_graus": 110.52299996717716
   },
   "cega_8": {
    "sem_resultado": 0,
    "falhas_de_ajuste": 0,
    "convergencia": {
-    "k": 45,
+    "k": 44,
     "n": 100,
-    "frac": 0.45,
+    "frac": 0.44,
     "ic95": [
-     0.3561437510640346,
-     0.5475557296835656
+     0.34671865400968327,
+     0.537720722887437
     ]
    },
    "fisica": {
-    "k": 27,
+    "k": 23,
     "n": 100,
-    "frac": 0.27,
+    "frac": 0.23,
     "ic95": [
-     0.1926946091766482,
-     0.3643230022623127
+     0.15843154746876406,
+     0.32154564856827694
     ]
    },
    "chi2N_menor_1_5": {
@@ -227,114 +227,114 @@
     ]
    },
    "acerto_sinal_logs_entre_convergidos": {
-    "k": 32,
-    "n": 45,
-    "frac": 0.7111111111111111,
+    "k": 29,
+    "n": 44,
+    "frac": 0.6590909090909091,
     "ic95": [
-     0.5663118252773978,
-     0.8227008196809984
+     0.5113886797193951,
+     0.7812436737136005
     ]
    },
-   "tempo_mediano_s": 202.7937662601471,
-   "tempo_medio_s": 318.9542240929604,
-   "custo_por_sucesso_conv_s": 708.787164651023,
-   "custo_por_sucesso_fis_s": 1181.3119410850384,
+   "tempo_mediano_s": 205.69780659675598,
+   "tempo_medio_s": 400.0474762630463,
+   "custo_por_sucesso_conv_s": 909.1988096887416,
+   "custo_por_sucesso_fis_s": 1739.3368533175924,
    "n_ajustes_medio": 8.0,
-   "erro_mediano_logq": 0.37208281423159506,
-   "erro_mediano_abslogs": 0.03444327143988504,
-   "erro_mediano_alpha_graus": 44.9596856451047
+   "erro_mediano_logq": 0.36099686339882087,
+   "erro_mediano_abslogs": 0.03678161235459691,
+   "erro_mediano_alpha_graus": 37.87974678463745
   }
  },
  "rede_sem_ajuste": {
-  "tempo_mediano_s": 0.029609322547912598,
-  "erro_mediano_logq": 0.6928258031050751,
-  "erro_mediano_abslogs": 0.05118971821905911,
-  "erro_mediano_alpha_graus": 28.511468761369702
+  "tempo_mediano_s": 0.030374646186828613,
+  "erro_mediano_logq": 0.62422031359878,
+  "erro_mediano_abslogs": 0.04649777453479133,
+  "erro_mediano_alpha_graus": 26.472626945754456
  },
  "mcnemar": {
   "rede_2ramos x cega_mesmo_orcamento": {
    "convergencia": {
-    "so_primeira": 10,
+    "so_primeira": 7,
     "so_segunda": 10,
-    "p": 1.0
+    "p": 0.629058837890625
    },
    "fisica": {
-    "so_primeira": 10,
+    "so_primeira": 5,
     "so_segunda": 4,
-    "p": 0.1795654296875
+    "p": 1.0
    }
   },
   "rede_2ramos x cega_8": {
    "convergencia": {
-    "so_primeira": 6,
-    "so_segunda": 24,
-    "p": 0.0014309063553810122
+    "so_primeira": 4,
+    "so_segunda": 21,
+    "p": 0.0009105205535888672
    },
    "fisica": {
-    "so_primeira": 6,
-    "so_segunda": 16,
-    "p": 0.052478790283203125
+    "so_primeira": 5,
+    "so_segunda": 14,
+    "p": 0.063568115234375
    }
   },
   "rede_2ramos x rede_1ramo": {
    "convergencia": {
-    "so_primeira": 5,
-    "so_segunda": 1,
-    "p": 0.21875
+    "so_primeira": 6,
+    "so_segunda": 3,
+    "p": 0.5078125
    },
    "fisica": {
-    "so_primeira": 5,
+    "so_primeira": 6,
     "so_segunda": 2,
-    "p": 0.453125
+    "p": 0.2890625
    }
   }
  },
  "fator_aceleracao": {
   "cega_8 / rede_2ramos": {
    "convergencia": {
-    "fator": 2.841735086824579,
+    "fator": 2.8307784822298845,
     "ic95": [
-     1.871524254179386,
-     4.293267767139082
+     1.7099347896034465,
+     4.587746307232652
     ]
    },
    "fisica": {
-    "fator": 2.9820676837048055,
+    "fator": 2.80798638494945,
     "ic95": [
-     1.6764008116679487,
-     5.093944749831277
+     1.3726178738473722,
+     5.183393485750089
     ]
    }
   },
   "cega_8 / rede_1ramo": {
    "convergencia": {
-    "fator": 6.336740920031733,
+    "fator": 6.742818458961623,
     "ic95": [
-     3.7410114963739973,
-     10.206864423048465
+     3.8851036483656425,
+     11.426287622276886
     ]
    },
    "fisica": {
-    "fator": 6.428577744959729,
+    "fator": 5.374710365838974,
     "ic95": [
-     3.3088144402060826,
-     12.060547616703012
+     2.367555871918832,
+     10.585377582060937
     ]
    }
   },
   "cega_mesmo_orcamento / rede_2ramos": {
    "convergencia": {
-    "fator": 1.287987145876723,
+    "fator": 1.3770669925647776,
     "ic95": [
-     0.8167165029234075,
-     2.039321839251687
+     0.6125675372637993,
+     2.7927515308041015
     ]
    },
    "fisica": {
-    "fator": 1.9905255890822082,
+    "fator": 1.6477724697356313,
     "ic95": [
-     1.091666112344996,
-     3.9643212944952775
+     0.6786616261599108,
+     3.7492577391754485
     ]
    }
   }
@@ -343,16 +343,16 @@
   "<100": {
    "n": 15,
    "oraculo": 1.0,
-   "rede_1ramo": 0.7333333333333333,
-   "rede_2ramos": 0.7333333333333333,
+   "rede_1ramo": 0.8666666666666667,
+   "rede_2ramos": 0.9333333333333333,
    "cega_mesmo_orcamento": 1.0,
    "cega_8": 1.0
   },
   "100-1000": {
    "n": 4,
    "oraculo": 1.0,
-   "rede_1ramo": 0.5,
-   "rede_2ramos": 0.5,
+   "rede_1ramo": 0.25,
+   "rede_2ramos": 0.0,
    "cega_mesmo_orcamento": 0.25,
    "cega_8": 0.5
   },
@@ -368,10 +368,10 @@
    "n": 65,
    "oraculo": 0.8,
    "rede_1ramo": 0.07692307692307693,
-   "rede_2ramos": 0.1076923076923077,
-   "cega_mesmo_orcamento": 0.07692307692307693,
-   "cega_8": 0.27692307692307694
+   "rede_2ramos": 0.09230769230769231,
+   "cega_mesmo_orcamento": 0.12307692307692308,
+   "cega_8": 0.26153846153846155
   }
  },
- "oraculo_chi2N_mediano": 0.999119648233916
+ "oraculo_chi2N_mediano": 0.9991201834386125
 }
