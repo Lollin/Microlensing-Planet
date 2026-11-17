@@ -5,10 +5,12 @@ O teste 'uniform' (priori uniforme, sem ancoragem em cáusticas) é um arquivo s
 Versão 2:  --uchan (canal u(τ)), --target x (alvo |s − 1/s|), --wbin (peso de q, s, α na perda), --run NOME (não sobrescreve a versão 1).
 Versão 3:  --null (treino com eventos sem planeta: 9ª saída = probabilidade de planeta; q, s, α mascarados na perda)
            --null-test ARQ (conjunto só de lentes simples, para medir falsos positivos).
+Versão final: --delta (t0, u0, tE previstos como CORREÇÃO ao ajuste PSPL; ver mlens/torch_cnn.py).
+           Cada execução grava em models/meta_cnn_<run>.json o commit do git, a semente, os argumentos e as versões das bibliotecas.
 Ex.:  python scripts/02b_treinar_cnn.py --uchan --target x --null --train-data data/processed/train_null.npz --run v3"""
-import sys, os, pathlib, json, argparse, copy, numpy as np, torch, torch.nn as nn
+import sys, os, pathlib, json, argparse, copy, subprocess, datetime, platform, numpy as np, torch, torch.nn as nn
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mlens.torch_cnn import Net, prep_x, make_targets, decode
+from mlens.torch_cnn import Net, prep_x, make_targets, decode, clip_sc
 from mlens import metrics as M
 
 ap = argparse.ArgumentParser()
@@ -22,9 +24,27 @@ ap.add_argument("--wbin", type=float, default=1.0, help="peso na perda de log q,
 ap.add_argument("--null", action="store_true", help="9ª saída: probabilidade de planeta (requer 'planet' no arquivo de treino)")
 ap.add_argument("--null-test", default="data/processed/test_null.npz", help="teste só com lentes simples (falsos positivos)")
 ap.add_argument("--run", default="", help="nome do experimento: salva models/cnn_<run>.pt, models/metrics_cnn_<run>.json etc.")
+ap.add_argument("--delta", action="store_true", help="t0, u0, tE como correção ao ajuste PSPL (versão final)")
 ap.add_argument("--out", default="models/cnn_2l1s.pt"); ap.add_argument("--seed", type=int, default=0); a = ap.parse_args()
 torch.manual_seed(a.seed); np.random.seed(a.seed)
-d = np.load(a.train_data); X, sc, y, d2 = d["X"], d["sc"], d["y"], d["dchi2"]; n = len(y)
+
+
+def _git(*args):
+    try:
+        return subprocess.run(["git", *args], cwd=pathlib.Path(__file__).resolve().parents[1], capture_output=True, text=True, timeout=10).stdout.strip()
+    except Exception:
+        return ""
+
+
+PROV = dict(git_commit=_git("rev-parse", "HEAD"), git_alteracoes_nao_commitadas=bool(_git("status", "--porcelain", "--", "mlens", "scripts")),
+            data=datetime.datetime.now().isoformat(timespec="seconds"), semente=a.seed, argumentos=vars(a),
+            python=platform.python_version(), torch=torch.__version__, numpy=np.__version__)
+if PROV["git_alteracoes_nao_commitadas"]:
+    print("AVISO: há alterações não commitadas em mlens/ ou scripts/; o commit gravado não descreve exatamente o código usado.")
+d = np.load(a.train_data); X, sc_raw, y, d2 = d["X"], d["sc"], d["y"], d["dchi2"]; n = len(y)
+CLIP = a.delta                                                     # redes novas: escalares de entrada limitados (clip_sc)
+SC = (lambda v: clip_sc(v)) if CLIP else (lambda v: np.asarray(v))
+sc = SC(sc_raw)
 PL = d["planet"].astype(np.float32) if "planet" in d.files else np.ones(n, np.float32)
 if a.null and PL.min() == 1: sys.exit("ERRO: --null exige um arquivo de treino com eventos sem planeta (gere com --p-null).")
 idx = np.random.RandomState(a.seed).permutation(n); tr, va, te = idx[:int(.7 * n)], idx[int(.7 * n):int(.8 * n)], idx[int(.8 * n):]
@@ -34,7 +54,7 @@ if a.n_train:
     tr = tr[:a.n_train]
 sfx = f"_{a.run}" if a.run else ""
 if a.run and a.out == "models/cnn_2l1s.pt": a.out = f"models/cnn_{a.run}.pt"
-reg, flag = make_targets(y, a.target); trp = tr[PL[tr] > 0]; ym, ys = reg[trp].mean(0), reg[trp].std(0) + 1e-8; scm, scs = sc[tr].mean(0), sc[tr].std(0) + 1e-8
+reg, flag = make_targets(y, a.target, sc_raw, a.delta); trp = tr[PL[tr] > 0]; ym, ys = reg[trp].mean(0), reg[trp].std(0) + 1e-8; scm, scs = sc[tr].mean(0), sc[tr].std(0) + 1e-8
 dev = "cuda" if torch.cuda.is_available() else "cpu"; print("device:", dev, "| treino:", len(tr), "validação:", len(va), "teste-mix:", len(te))
 T = lambda i: (torch.tensor(prep_x(X[i], sc[i], a.uchan)).to(dev), torch.tensor((sc[i] - scm) / scs, dtype=torch.float32).to(dev),
                torch.tensor((reg[i] - ym) / ys).to(dev), torch.tensor(flag[i]).to(dev), torch.tensor(PL[i]).to(dev))
@@ -68,7 +88,7 @@ net.load_state_dict(best[1]); net.eval(); print("melhor época (validação):", 
 
 
 def predict_raw(Xe, Sce):
-    outs = []
+    Sce = SC(Sce); outs = []
     with torch.no_grad():
         for i in range(0, len(Xe), 1000):
             outs.append(net(torch.tensor(prep_x(Xe[i:i + 1000], Sce[i:i + 1000], a.uchan)).to(dev), torch.tensor((Sce[i:i + 1000] - scm) / scs, dtype=torch.float32).to(dev)).cpu().numpy())
@@ -76,9 +96,9 @@ def predict_raw(Xe, Sce):
 
 
 def run(Xe, Sce, ye, d2e, tag, pl=None):
-    P = decode(predict_raw(Xe, Sce), ym, ys, a.target)
+    P = decode(predict_raw(Xe, Sce), ym, ys, a.target, Sce, a.delta)
     extra = {} if pl is None else {"planet": pl}
-    np.savez(f"data/processed/test_pred_{tag}{sfx}.npz", y=ye, d2=d2e, **extra, **{k: np.asarray(v) for k, v in P.items()})
+    np.savez(f"data/processed/test_pred_{tag}{sfx}.npz", y=ye, d2=d2e, sc=Sce, **extra, **{k: np.asarray(v) for k, v in P.items()})
     if pl is not None and pl.min() == 0:                      # avalia regressão só nos eventos com planeta
         k = pl > 0; P = {kk: np.asarray(v)[k] for kk, v in P.items()}; ye, d2e = ye[k], d2e[k]
     rep = M.full_report(ye, P, d2e); M.print_report(rep, f"teste {tag}")
@@ -89,8 +109,8 @@ def run(Xe, Sce, ye, d2e, tag, pl=None):
     return rep
 
 
-res = {"mix": run(X[te], sc[te], y[te], d2[te], "mix", PL[te])}
-meta = {"cfg": dict(uchan=a.uchan, target=a.target, wbin=a.wbin, null=a.null, train_data=a.train_data), "n_train": int(len(tr)), "n_val": int(len(va)), "n_test_mix": int(len(te)), "best_epoch": int(best[2]), "epochs": a.epochs}
+res = {"mix": run(X[te], sc_raw[te], y[te], d2[te], "mix", PL[te])}
+meta = {"cfg": dict(uchan=a.uchan, target=a.target, wbin=a.wbin, null=a.null, delta=a.delta, train_data=a.train_data), "proveniencia": PROV, "n_train": int(len(tr)), "n_val": int(len(va)), "n_test_mix": int(len(te)), "best_epoch": int(best[2]), "epochs": a.epochs}
 if os.path.exists(a.test_data):
     u = np.load(a.test_data); res["uniform"] = run(u["X"], u["sc"], u["y"], u["dchi2"], "uniform"); meta["n_test_uniform"] = int(len(u["y"]))
 else:
@@ -101,4 +121,4 @@ if a.null and os.path.exists(a.null_test):
     np.save(f"data/processed/test_null_pplanet{sfx}.npy", pp)
     print(f"== teste sem planeta (n={len(pp)}): falsos positivos (p_planeta > 0,5) = {100 * np.mean(pp > 0.5):.1f}%")
 json.dump(res, open(f"models/metrics_cnn{sfx}.json", "w"), indent=2); json.dump(meta, open(f"models/meta_cnn{sfx}.json", "w"))
-torch.save(dict(state=net.state_dict(), ym=ym, ys=ys, scm=scm, scs=scs, cfg=dict(uchan=a.uchan, target=a.target, null=a.null)), a.out); print("salvo em", a.out)
+torch.save(dict(state=net.state_dict(), ym=ym, ys=ys, scm=scm, scs=scs, cfg=dict(uchan=a.uchan, target=a.target, null=a.null, delta=a.delta, clip_sc=CLIP), prov=PROV), a.out); print("salvo em", a.out)

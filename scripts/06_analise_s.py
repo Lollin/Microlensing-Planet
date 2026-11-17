@@ -1,11 +1,12 @@
-"""Analise de s SEM retreinar. Usa data/processed/test_pred_uniform.npz.
-Uso: python scripts/06_analise_s.py
-Saidas: figures/fig_s_analise.png, figures/fig_erro_vs_excesso.png, models/analise_s.json"""
-import json, numpy as np, matplotlib
+"""Analise de s SEM retreinar. Usa data/processed/test_pred_uniform_<run>.npz.
+Uso: python scripts/06_analise_s.py --run final
+Saidas: figures/fig_s_analise_<run>.png, figures/fig_erro_vs_excesso_<run>.png, models/analise_s_<run>.json"""
+import json, argparse, numpy as np, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
 
-d = np.load("data/processed/test_pred_uniform.npz")
+_ap = argparse.ArgumentParser(); _ap.add_argument("--run", default="final"); RUN = _ap.parse_args().run
+d = np.load(f"data/processed/test_pred_uniform_{RUN}.npz")
 y, p, ex = d["y"], d["p_wide"], d["d2"]
 ls = y[:, 4]; lab = ls > 0; pred = p > 0.5
 RES = 0.15                      # regiao ressonante: |log s| < 0.15  (0.71 < s < 1.41)
@@ -37,9 +38,10 @@ for nm, m, col in [("todos", np.ones_like(lab), "#9bb7d4"), (r"excesso$>100$", e
     idx = o[m[o]]; cov = np.arange(1, len(idx) + 1) / len(idx)
     cum = np.cumsum(pred[idx] == lab[idx]) / np.arange(1, len(idx) + 1)
     ax[2].plot(cov[20:], cum[20:], label=nm, color=col)
+    out.setdefault("acc_20pct_mais_confiantes", {})["todos" if col == "#9bb7d4" else "excesso>100"] = float(cum[max(int(0.2 * len(idx)) - 1, 0)])
 ax[2].axhline(.5, color="k", ls="--", lw=1); ax[2].set_xlabel("fração de eventos mantidos (mais confiantes primeiro)")
 ax[2].set_ylabel("acerto do sinal"); ax[2].set_ylim(.4, 1); ax[2].legend(); ax[2].set_title("(c) Classificação seletiva")
-plt.tight_layout(); plt.savefig("figures/fig_s_analise.png", dpi=200); plt.close()
+plt.tight_layout(); plt.savefig(f"figures/fig_s_analise_{RUN}.png", dpi=200); plt.close()
 
 # Figura 3 ampliada: erro vs excesso (q, alpha, sinal)
 def werr(a, b): return np.abs((a - b + 180) % 360 - 180)
@@ -59,7 +61,7 @@ mq = line(ax[0], eq, r"erro absoluto em $\log_{10} q$ (dex)", r"(a) Razão de ma
 ma = line(ax[1], ea, r"erro angular em $\alpha$ (graus)", r"(b) Ângulo $\alpha$", ref=90)
 ax[2].bar(x, B, .55, color="#c0392b"); ax[2].axhline(.5, color="k", ls="--", lw=1.2); ax[2].set_ylim(0, 1)
 ax[2].set_xticks(x, LAB); ax[2].set_xlabel(r"excesso de $\chi^2$ do ajuste 1L1S"); ax[2].set_ylabel("acerto close/wide"); ax[2].set_title(r"(c) Sinal de $\log s$ ($|\log s|\geq0{,}15$)", fontsize=13)
-plt.tight_layout(); plt.savefig("figures/fig_erro_vs_excesso.png", dpi=220); plt.close()
+plt.tight_layout(); plt.savefig(f"figures/fig_erro_vs_excesso_{RUN}.png", dpi=220); plt.close()
 out.update(erro_logq_mediana_por_bin=dict(zip(LAB, map(float, mq))), erro_alpha_mediana_por_bin=dict(zip(LAB, map(float, ma))),
            acc_sinal_por_bin=dict(zip(LAB, A)), acc_sinal_fora_res_por_bin=dict(zip(LAB, B)))
-json.dump(out, open("models/analise_s.json", "w"), indent=1); print(json.dumps(out, indent=1))
+json.dump(out, open(f"models/analise_s_{RUN}.json", "w"), indent=1); print(json.dumps(out, indent=1))

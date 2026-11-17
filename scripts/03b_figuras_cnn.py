@@ -11,6 +11,9 @@ p = {"t0": 100.0, "u0": u0, "tE": 30.0, "logq": float(np.log10(q0)), "logs": flo
 rng = np.random.default_rng(11); p, data = simulate.simulate_event(rng, p)
 X, sc, d2, fit = featurize(data); plots.fig_event(p, data, fit, "figures/fig_evento.png"); print("Δχ² do evento exemplo:", round(d2))
 import os
-tag = "uniform" if os.path.exists("data/processed/test_pred_uniform.npz") else "mix"
-t = np.load(f"data/processed/test_pred_{tag}.npz"); P = {k: t[k] for k in ["t0", "u0", "tE", "logq", "abs_logs", "logs", "alpha", "p_wide"]}
-plots.fig_resultados(t["y"], P, t["d2"], "figures/fig_resultados_cnn.png"); print("figuras ok; população de teste:", tag)
+f = next((x for x in ("data/processed/test_pred_uniform_final.npz", "data/processed/test_pred_uniform.npz") if os.path.exists(x)), None)
+if f:
+    t = np.load(f); P = {k: t[k] for k in ["t0", "u0", "tE", "logq", "abs_logs", "logs", "alpha", "p_wide"]}
+    plots.fig_resultados(t["y"], P, t["d2"], "figures/fig_resultados_cnn.png"); print("figuras ok; previsões:", f)
+else:
+    print("figuras de topologia e do evento exemplo ok (sem previsões para fig_resultados_cnn)")

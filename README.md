@@ -1,5 +1,9 @@
 # Microlensing-Planet
 
+> **Versão da monografia (TCC):** tag [`v1.0-tcc`](../../tree/v1.0-tcc). Para reproduzir todas as tabelas e figuras:
+> `python reproduzir.py` — detalhes, sementes e a correspondência tabela → script em [`docs/REPRODUZIR.md`](docs/REPRODUZIR.md).
+> Os arquivos da versão final têm o sufixo `final`; os de versões anteriores estão em `models/historico/`.
+
 Inferência de parâmetros de eventos de microlente gravitacional **2L1S** (lente binária / planetária) com redes neurais, a partir de curvas de luz sintéticas realistas (lacunas, ruído gaussiano, vários telescópios).
 
 ## Estrutura
@@ -14,7 +18,7 @@ docs/         PLANO.md e notas
 notebooks/    exploração (1L1S antigo entra em notebooks/legacy_1L1S/)
 ```
 
-## Rodar (≈2 min em CPU)
+## Versão inicial (MLP, histórica — não corresponde à monografia)
 ```bash
 pip install -r requirements.txt
 python scripts/01_gerar_dataset.py --n 6000

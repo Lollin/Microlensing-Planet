@@ -9,3 +9,13 @@ banner/*.png
 banner/*.txt
 *.zip
 models/*.pt
+!models/cnn_final.pt
+!models/cnn_final_s1.pt
+!models/cnn_final_det.pt
+!models/cnn_abl_sem_u.pt
+!models/cnn_abl_u.pt
+*_rapido*
+models/anterior_*/
+!models/cnn_final_s2.pt
+!models/cnn_abl_sem_u_s1.pt
+!models/cnn_abl_sem_u_s2.pt
