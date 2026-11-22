@@ -39,8 +39,8 @@ Cada conjunto usa as sementes `s, s+1, …, s+n−1`, uma por evento, sem sobrep
 | Teste uniforme | `test_uniform.npz` | 6 000 | 900 000 | priori uniforme, sem ancoragem |
 | Sem planeta (calibração) | `test_null.npz` | 3 000 | 910 000 | escolhe o limiar de 5% de falsos positivos |
 | Sem planeta (controle) | `test_null_vbm.npz` | 3 000 | 920 000 | VBMicrolensing com q = 1e-9, s = 10 |
-| Sem planeta (independente) | `test_null_indep.npz` | 3 000 | 930 000 | avaliação dos eventos 1L1S (Seção 4.7) |
-| Confirmação | `test_confirmacao.npz` | 6 000 | 950 000 | semente nova; avaliado uma única vez pela rede final (Seção 4.x) |
+| Sem planeta (independente) | `test_null_indep.npz` | 3 000 | 930 000 | avaliação dos eventos 1L1S (Seção 4.8) |
+| Confirmação | `test_confirmacao.npz` | 6 000 | 950 000 | semente nova; avaliado uma única vez pela rede final (Seção 4.3) |
 | Benchmark pyLIMA | — | 100 | 2 026 | eventos simulados com o pyLIMA, com luz de mistura |
 
 Treinos: 30 épocas, AdamW, taxa máxima 2e-3, lotes de 128. Rede final e rede sem u(τ): sementes 0, 1 e 2 (os resultados
@@ -52,19 +52,19 @@ principais são os da semente 0). Rede só com u(τ) e rede de detecção: semen
 |---|---|---|
 | Tabela 3 (erros) | `02b_treinar_cnn.py --run final` | `models/metrics_cnn_final.json` (chave `uniform`) |
 | Tabela 4, Figura 7 (R², previsto × verdadeiro) | `07_r2.py` | `models/r2_final.json`, `figures/fig_r2_final.png` |
-| **Nova tabela: rede × ajuste PSPL** (tópico 2) | `12_rede_vs_pspl.py --run final` | `models/rede_vs_pspl_final.json`, `figures/fig_rede_vs_pspl_final.png` |
-| Figura 8 (erro × excesso de χ²) | `06_analise_s.py --run final` | `figures/fig_erro_vs_excesso_final.png` |
-| Figura 9 (sinal de log s) | `06_analise_s.py --run final` | `figures/fig_s_analise_final.png`, `models/analise_s_final.json` |
-| Tabelas de ablação | `02b_treinar_cnn.py` nos runs `abl_sem_u[_s1,_s2]`, `abl_u`, `final[_s1,_s2]` | `models/metrics_cnn_<run>.json` |
-| Tabela das sementes (Apêndice B) | `02b_treinar_cnn.py` e `12_rede_vs_pspl.py` nos runs `final`, `final_s1`, `final_s2` | `models/metrics_cnn_final*.json`, `models/rede_vs_pspl_final*.json` |
-| Regime planetário, q < 0,03 (tópico 3) | `15_regime_planetario.py --run final` | `models/regime_planetario_final.json` |
-| Tabela 6, Figura 10 (detecção) | `10_deteccao.py --run final_det` | `models/deteccao_final_det.json`, `figures/fig_deteccao_final_det.png` |
-| Detecção só no regime planetário, q < 0,03 (tópico 3) | `10_deteccao.py --logq-max -1.52` | `models/deteccao_final_det_logq-1.52.json` |
+| Tabela 5, Figura 8 (rede × ajuste PSPL, Seção 4.3) | `12_rede_vs_pspl.py --run final` | `models/rede_vs_pspl_final.json`, `figures/fig_rede_vs_pspl_final.png` |
+| Figura 9 (erro × excesso de χ²) | `06_analise_s.py --run final` | `figures/fig_erro_vs_excesso_final.png` |
+| Figura 10 (sinal de log s) | `06_analise_s.py --run final` | `figures/fig_s_analise_final.png`, `models/analise_s_final.json` |
+| Tabelas 6 e 7 (ablação) | `02b_treinar_cnn.py` nos runs `abl_sem_u[_s1,_s2]`, `abl_u`, `final[_s1,_s2]` | `models/metrics_cnn_<run>.json` |
+| Tabela 16 (sementes, Apêndice B) | `02b_treinar_cnn.py` e `12_rede_vs_pspl.py` nos runs `final`, `final_s1`, `final_s2` | `models/metrics_cnn_final*.json`, `models/rede_vs_pspl_final*.json` |
+| Regime planetário, q < 0,03 (Seção 4.2) | `15_regime_planetario.py --run final` | `models/regime_planetario_final.json` |
+| Tabela 8, Figura 11 (detecção) | `10_deteccao.py --run final_det` | `models/deteccao_final_det.json`, `figures/fig_deteccao_final_det.png` |
+| Detecção só no regime planetário, q < 0,03 (Seção 4.7) | `10_deteccao.py --logq-max -1.52` | `models/deteccao_final_det_logq-1.52.json` |
 | Controle da detecção | `10_deteccao.py --null-file test_null_vbm.npz` | `models/deteccao_final_det_test_null_vbm.json` |
-| Tabela 7, Figura 11 (eventos 1L1S) | `11_avaliar_1l1s.py --run final_det` | `models/avaliacao_1l1s_final_det.json`, `figures/fig_1l1s_final_det.png` |
-| Tabela 8, Figura 12 (pyLIMA) | `13_benchmark_pylima_v2.py` + `14_resumo_benchmark_v2.py` | `models/benchmark_v2_resumo.json`, `figures/fig_benchmark_v2.png` |
-| Tabela dos eventos reais (OGLE) | `05_ogle.py --event 2012-BLG-0406` (e 2016-BLG-1195) | `models/ogle_*.json`, `figures/ogle_*.png` |
-| Conjunto de confirmação | `17_confirmacao.py` | `models/confirmacao_final.json`, `models/rede_vs_pspl_confirmacao_final.json` |
+| Tabela 9, Figura 12 (eventos 1L1S) | `11_avaliar_1l1s.py --run final_det` | `models/avaliacao_1l1s_final_det.json`, `figures/fig_1l1s_final_det.png` |
+| Tabelas 10 e 11, Figura 13 (pyLIMA) | `13_benchmark_pylima_v2.py` + `14_resumo_benchmark_v2.py` | `models/benchmark_v2_resumo.json`, `figures/fig_benchmark_v2.png` |
+| Tabela 12, Figura 14 (eventos reais do OGLE) | `05_ogle.py --event 2012-BLG-0406` (e 2016-BLG-1195) | `models/ogle_*.json`, `figures/ogle_*.png` |
+| Conjunto de confirmação (Seção 4.3) | `17_confirmacao.py` | `models/confirmacao_final.json`, `models/rede_vs_pspl_confirmacao_final.json` |
 | Todos os números e tabelas do texto | `16_latex.py` | `latex_tcc/resultados/`, `latex_tcc/figuras/` |
 | Figura 3 (topologias) | `03b_figuras_cnn.py` | `figures/fig_topologias.png` |
 | Figura 4 (degenerescência) | `08_degenerescencia_s.py` | `figures/fig_degenerescencia_s.png` |
@@ -74,9 +74,8 @@ principais são os da semente 0). Rede só com u(τ) e rede de detecção: semen
 
 1. **t0, u0, tE como correção ao ajuste PSPL** (`--delta`). A rede prevê δt0 = (t0 − t0_PSPL)/tE_PSPL,
    δu0 = log10(u0/u0_PSPL) e δtE = log10(tE/tE_PSPL), comprimidos por asinh. Saída zero = repetir o ajuste.
-   A referência é o ajuste PSPL limitado a uma faixa física, porque em ~8% dos eventos o ajuste diverge.
    O ajuste PSPL livre (Levenberg–Marquardt) é refeito com limites físicos (u0 em [0,001; 2], tE em [1; 500] d) quando
-   sai dessa faixa, o que acontecia em ~8% do teste uniforme e ~18% do treino (`mlens/features.py`).
+   sai dessa faixa, o que acontece em 7,5% do teste uniforme e ~18% do treino (`mlens/features.py`).
 2. **Comparação direta com o ajuste PSPL** (`12_rede_vs_pspl.py`): erro dos dois estimadores no mesmo evento,
    teste de Wilcoxon pareado e a fração da correção aplicada, β.
 3. **Eventos 1L1S**: o limiar é escolhido em `test_null.npz` e a avaliação é feita em `test_null_indep.npz`.
@@ -86,6 +85,12 @@ principais são os da semente 0). Rede só com u(τ) e rede de detecção: semen
 
 ## Autoria do código e uso de inteligência artificial
 
-O código foi desenvolvido por Danilo Parmejane Menezes, com auxílio do assistente de IA Claude (Anthropic) na escrita,
-na depuração e na revisão de partes do código. As bibliotecas usadas são VBMicrolensing (Bozza), pyLIMA (Bachelet et al.)
-e PyTorch.
+O trabalho é de Danilo Parmejane Menezes. O assistente de inteligência artificial generativa Claude (Anthropic),
+usado entre outubro e novembro de 2026, foi usado de forma extensa no desenvolvimento do código: na escrita, na
+depuração e na revisão do simulador, da rede, das análises e deste roteiro de reprodução. Também foi usado na redação
+da monografia: partes dos Capítulos 3 a 5, do Resumo e do Abstract foram redigidas com o assistente a partir dos
+resultados e depois revisadas e reescritas pelo autor, e o restante do texto passou por revisão de estilo e de
+gramática. A definição do problema, a aprovação das decisões de método, a execução dos experimentos e a conferência
+dos resultados e do texto final são de responsabilidade do autor.
+
+As bibliotecas usadas são VBMicrolensing (Bozza), pyLIMA (Bachelet et al.) e PyTorch.
